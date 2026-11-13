@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chuka University SRMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; overflow-x: hidden; }
+        .sidebar { height: 100vh; width: 260px; position: fixed; top: 0; left: 0; background: #1e293b; color: white; padding-top: 20px; z-index: 1000; }
+        .sidebar h3 { text-align: center; font-weight: 700; margin-bottom: 30px; color: #38bdf8; font-size: 22px; }
+        .sidebar a { padding: 15px 25px; text-decoration: none; font-size: 16px; color: #cbd5e1; display: block; cursor: pointer; border-left: 4px solid transparent; }
+        .sidebar a:hover, .sidebar a.active { background: #0f172a; color: white; border-left: 4px solid #38bdf8; }
+        .sidebar a i { margin-right: 15px; width: 20px; text-align: center; }
+        .main-content { margin-left: 260px; padding: 20px 40px; }
+        .top-navbar { background: white; padding: 15px 30px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; }
+        .card-header { background: white; font-weight: 600; color: #334155; padding: 15px 20px; border-bottom: 1px solid #f1f5f9; border-radius: 12px 12px 0 0 !important; }
+        .card-body { padding: 20px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .form-control, .form-select { border-radius: 8px; padding: 10px 15px; }
+        .table th { font-weight: 600; color: #64748b; }
+        .chart-container { position: relative; height: 300px; width: 100%; }
+        .transcript-card { background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-top: 20px; }
+        .student-header { border-bottom: 2px solid #28a745; padding-bottom: 10px; margin-bottom: 20px; }
+
+        .student-checkbox-list {
+            max-height: 250px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .student-checkbox-label:hover { background-color: #e2e8f0 !important; }
+    </style>
+</head>
+<body>
+<div class="sidebar">
+    <h3><i class="fas fa-university"></i> Chuka SRMS</h3>
+    <a id="nav-dashboard" onclick="showPage('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</a>
+    <a id="nav-students" class="active" onclick="showPage('students')"><i class="fas fa-user-graduate"></i> Students</a>
+    <a id="nav-courses" onclick="showPage('courses')"><i class="fas fa-book"></i> Courses</a>
+    <a id="nav-tutors" onclick="showPage('tutors')"><i class="fas fa-chalkboard-teacher"></i> Tutors</a>
+    <a id="nav-enrollments" onclick="showPage('enrollments')"><i class="fas fa-clipboard-list"></i> Enrollments</a>
+    <a id="nav-results" onclick="showPage('results')"><i class="fas fa-file-alt"></i> Examination Results</a>
+    <a id="nav-allocations" onclick="showPage('allocations')"><i class="fas fa-tasks"></i> Course Allocation</a>
+    <a id="nav-reports" onclick="showPage('reports')"><i class="fas fa-chart-line"></i> Reports</a>
+</div>
+
+<div class="main-content">
+    <div class="top-navbar">
+        <h4 id="pageTitle" class="mb-0 fw-bold text-dark">Student Management</h4>
+        <div class="d-flex align-items-center gap-3">
+            <div class="input-group" id="searchContainer" style="width: 300px; display: flex;">
+                <input type="text" id="globalSearch" class="form-control" placeholder="Search students..." onkeyup="handleSearch(event)">
+                <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+            </div>
+            <span class="text-muted"><i class="fas fa-user-circle fa-lg"></i> Admin</span>
+            <form action="/logout" method="post" class="mb-0"><button type="submit" class="btn btn-outline-danger btn-sm">Logout</button></form>
+        </div>
+    </div>
+
+    <div id="page-dashboard" class="page">
+        <div class="row">
+            <div class="col-md-6"><div class="card"><div class="card-header">Students by Major</div><div class="card-body"><div class="chart-container"><canvas id="majorChart"></canvas></div></div></div></div>
+            <div class="col-md-6"><div class="card"><div class="card-header">Enrollments by Semester</div><div class="card-body"><div class="chart-container"><canvas id="semesterChart"></canvas></div></div></div></div>
+        </div>
+    </div>
+
+    <div id="page-students" class="page active">
+        <div class="card">
+            <div class="card-header">Add / Edit Student</div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <input type="text" id="studentId" class="form-control" style="width: 200px;" placeholder="Student ID">
+                    <button id="generateStudentBtn" class="btn btn-secondary" onclick="generateStudentId()"><i class="fas fa-magic"></i> Generate ID</button>
+                    <input type="text" id="firstName" class="form-control" style="width: 200px;" placeholder="First Name">
+                    <input type="text" id="lastName" class="form-control" style="width: 200px;" placeholder="Last Name">
+                    <input type="text" id="major" class="form-control" style="width: 200px;" placeholder="Major">
+                    <button id="addStudentBtn" class="btn btn-success" onclick="addStudent()"><i class="fas fa-save"></i> Save</button>
+                    <button id="updateStudentBtn" class="btn btn-primary" style="display:none;" onclick="updateStudent()"><i class="fas fa-edit"></i> Update</button>
+                    <button id="cancelStudentBtn" class="btn btn-danger" style="display:none;" onclick="loadStudents()"><i class="fas fa-times"></i> Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                Stored Students
+                <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='http://localhost:8080/api/students/export'"><i class="fas fa-file-excel"></i> Export to CSV</button>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped"><thead><tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Major</th><th>Actions</th></tr></thead><tbody id="studentTable"></tbody></table>
+            </div>
+            <div class="card-footer d-flex justify-content-between align-items-center bg-white">
+                <button class="btn btn-outline-secondary btn-sm" id="prevBtn" onclick="changePage(-1)">Previous</button>
+                <span id="pageInfo" class="text-muted fw-bold">Page 1</span>
+                <button class="btn btn-outline-secondary btn-sm" id="nextBtn" onclick="changePage(1)">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-courses" class="page">
+        <div class="card">
+            <div class="card-header">Add / Edit Course</div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <input type="text" id="courseId" class="form-control" style="width: 200px;" placeholder="Course ID">
+                    <button class="btn btn-secondary" onclick="generateCourseId()"><i class="fas fa-magic"></i> Generate ID</button>
+                    <input type="text" id="courseName" class="form-control" style="width: 200px;" placeholder="Course Name">
+                    <input type="number" id="credits" class="form-control" style="width: 200px;" placeholder="Credits">
+                    <input type="text" id="department" class="form-control" style="width: 200px;" placeholder="Department">
+                    <button id="addCourseBtn" class="btn btn-success" onclick="addCourse()">Save</button>
+                    <button id="updateCourseBtn" class="btn btn-primary" style="display:none;" onclick="updateCourse()">Update</button>
+                    <button id="cancelCourseBtn" class="btn btn-danger" style="display:none;" onclick="loadCourses()">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">Stored Courses</div>
+            <div class="card-body p-0"><table class="table table-hover table-striped"><thead><tr><th>Course ID</th><th>Course Name</th><th>Credits</th><th>Department</th><th>Actions</th></tr></thead><tbody id="courseTable"></tbody></table></div>
+        </div>
+    </div>
+
+    <div id="page-tutors" class="page">
+        <div class="card">
+            <div class="card-header">Add / Edit Tutor</div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <input type="text" id="tutorId" class="form-control" style="width: 200px;" placeholder="Tutor ID">
+                    <button class="btn btn-secondary" onclick="generateTutorId()">Generate ID</button>
+                    <input type="text" id="tutorFirstName" class="form-control" style="width: 200px;" placeholder="First Name">
+                    <input type="text" id="tutorLastName" class="form-control" style="width: 200px;" placeholder="Last Name">
+                    <input type="text" id="tutorDepartment" class="form-control" style="width: 200px;" placeholder="Department">
+                    <button id="addTutorBtn" class="btn btn-success" onclick="addTutor()">Save</button>
+                    <button id="updateTutorBtn" class="btn btn-primary" style="display:none;" onclick="updateTutor()">Update</button>
+                    <button id="cancelTutorBtn" class="btn btn-danger" style="display:none;" onclick="loadTutors()">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">Stored Tutors</div>
+            <div class="card-body p-0"><table class="table table-hover table-striped"><thead><tr><th>Tutor ID</th><th>First Name</th><th>Last Name</th><th>Department</th><th>Actions</th></tr></thead><tbody id="tutorTable"></tbody></table></div>
+        </div>
+    </div>
+
+    <div id="page-enrollments" class="page">
+        <div class="card border-success mb-4">
+            <div class="card-header text-success d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-bolt"></i> Bulk Enroll Students (Fast Way)</span>
+                <span class="badge bg-success" id="selectedCount">0 Selected</span>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label text-muted fw-bold">Select Course</label>
+                        <select id="bulkCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label text-muted fw-bold">Semester</label>
+                        <input type="number" id="bulkSemester" class="form-control" placeholder="e.g. 1" min="1" max="2">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label text-muted fw-bold">Year</label>
+                        <input type="number" id="bulkYear" class="form-control" placeholder="e.g. 2024">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button class="btn btn-success w-100" onclick="bulkEnroll()"><i class="fas fa-check-double"></i> Enroll</button>
+                    </div>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="form-label text-muted fw-bold mb-0">Select Students:</label>
+                    <input type="text" id="bulkSearch" class="form-control" style="width: 250px;" placeholder="Search student by name..." onkeyup="filterBulkStudents()">
+                </div>
+                <div class="student-checkbox-list" id="studentCheckboxList"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Manual Enroll (Single Student)</div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <input type="text" id="enrollmentId" class="form-control" style="width: 200px;" placeholder="Enrollment ID">
+                    <button class="btn btn-secondary" onclick="generateEnrollmentId()">Generate ID</button>
+                    <select id="enrollStudentId" class="form-select" style="width: 250px;"><option value="">-- Select Student --</option></select>
+                    <select id="enrollCourseId" class="form-select" style="width: 250px;"><option value="">-- Select Course --</option></select>
+                    <input type="number" id="semester" class="form-control" style="width: 150px;" placeholder="Semester">
+                    <input type="number" id="year" class="form-control" style="width: 150px;" placeholder="Year">
+                    <button id="addEnrollmentBtn" class="btn btn-success" onclick="addEnrollment()">Save</button>
+                    <button id="updateEnrollmentBtn" class="btn btn-primary" style="display:none;" onclick="updateEnrollment()">Update</button>
+                    <button id="cancelEnrollmentBtn" class="btn btn-danger" style="display:none;" onclick="loadEnrollments()">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                Stored Enrollments
+                <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='http://localhost:8080/api/enrollments/export'"><i class="fas fa-file-excel"></i> Export to CSV</button>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped"><thead><tr><th>Enrollment ID</th><th>Student ID</th><th>Course ID</th><th>Sem</th><th>Year</th><th>Date</th><th>Actions</th></tr></thead><tbody id="enrollmentTable"></tbody></table>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-results" class="page">
+        <div class="card">
+            <div class="card-header">Add / Edit Examination Result</div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <input type="text" id="resultId" class="form-control" style="width: 200px;" placeholder="Result ID">
+                    <button class="btn btn-secondary" onclick="generateResultId()">Generate ID</button>
+                    <select id="resultEnrollmentId" class="form-select" style="width: 300px;"><option value="">-- Select Enrollment --</option></select>
+                    <input type="number" id="score" class="form-control" style="width: 120px;" placeholder="Score (0-100)" oninput="calculateGrade()">
+                    <input type="text" id="grade" class="form-control" style="width: 100px;" placeholder="Grade" readonly>
+                    <input type="number" id="resultSemester" class="form-control" style="width: 120px;" placeholder="Semester">
+                    <input type="number" id="resultYear" class="form-control" style="width: 120px;" placeholder="Year">
+                    <button id="addResultBtn" class="btn btn-success" onclick="addResult()">Save</button>
+                    <button id="updateResultBtn" class="btn btn-primary" style="display:none;" onclick="updateResult()">Update</button>
+                    <button id="cancelResultBtn" class="btn btn-danger" style="display:none;" onclick="loadResults()">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">Stored Results</div>
+            <div class="card-body p-0"><table class="table table-hover table-striped"><thead><tr><th>Result ID</th><th>Enrollment ID</th><th>Score</th><th>Grade</th><th>Sem</th><th>Year</th><th>Actions</th></tr></thead><tbody id="resultTable"></tbody></table></div>
+        </div>
+    </div>
+
+    <div id="page-allocations" class="page">
+        <div class="card">
+            <div class="card-header">Add / Edit Course Allocation</div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <input type="text" id="allocationId" class="form-control" style="width: 200px;" placeholder="Allocation ID">
+                    <button class="btn btn-secondary" onclick="generateAllocationId()">Generate ID</button>
+                    <select id="allocCourseId" class="form-select" style="width: 250px;"><option value="">-- Select Course --</option></select>
+                    <select id="allocTutorId" class="form-select" style="width: 250px;"><option value="">-- Select Tutor --</option></select>
+                    <input type="number" id="allocSemester" class="form-control" style="width: 150px;" placeholder="Semester">
+                    <input type="number" id="allocYear" class="form-control" style="width: 150px;" placeholder="Year">
+                    <button id="addAllocBtn" class="btn btn-success" onclick="addAllocation()">Save</button>
+                    <button id="updateAllocBtn" class="btn btn-primary" style="display:none;" onclick="updateAllocation()">Update</button>
+                    <button id="cancelAllocBtn" class="btn btn-danger" style="display:none;" onclick="loadAllocations()">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">Stored Course Allocations</div>
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped">
+                    <thead>
+                    <tr>
+                        <th>Allocation ID</th>
+                        <th>Course</th>
+                        <th>Tutor</th>
+                        <th>Semester</th>
+                        <th>Year</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="allocationTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-reports" class="page">
+        <div class="card">
+            <div class="card-header">Student Academic Transcript</div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+                    <select id="reportStudentSelect" class="form-select" style="width: 300px;"><option value="">-- Select a Student --</option></select>
+                    <button class="btn btn-primary" onclick="generateTranscript()">Generate Report</button>
+                    <button class="btn btn-danger" onclick="downloadPdf()">Download PDF</button>
+                </div>
+                <div id="transcriptOutput"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="studentProfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header bg-primary text-white"><h5 class="modal-title">Student Profile</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body" id="profileModalBody"></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div></div></div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
