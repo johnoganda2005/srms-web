@@ -21,4 +21,4 @@ A full-stack, secure web application designed to manage academic records, course
 ## 🛠️ How to Run This Project Locally
 1. **Clone the repository:**
    ```bash
-   git clone YOUR_GITHUB_LINK
+   git clone https://github.com/johnoganda2005/srms-web.git
