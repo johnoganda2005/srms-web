@@ -42,7 +42,7 @@ function generateAllocationId() { document.getElementById('allocationId').value 
 // STUDENTS
 function loadStudents() {
     resetStudentForm();
-    fetch(`http://localhost:8080/api/students?page=${currentPage}&size=10`).then(res => res.json()).then(data => {
+    fetch(`https://srms-web-pci5.onrender.com/api/students?page=${currentPage}&size=10`).then(res => res.json()).then(data => {
         const table = document.getElementById('studentTable');
         table.innerHTML = '';
         data.content.forEach(s => {
@@ -59,7 +59,7 @@ function changePage(direction) { currentPage += direction; loadStudents(); }
 
 function addStudent() {
     const student = { studentId: document.getElementById('studentId').value, firstName: document.getElementById('firstName').value, lastName: document.getElementById('lastName').value, major: document.getElementById('major').value, dateOfBirth: "2000-01-01", currentSemester: 1, currentYear: 1, academicStatus: "Active" };
-    fetch('http://localhost:8080/api/students', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(student) })
+    fetch('https://srms-web-pci5.onrender.com/api/students', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(student) })
         .then(async res => { if (!res.ok) { const err = await res.json(); throw new Error(err.error || "Failed"); } return res.json(); })
         .then(() => loadStudents()).catch(err => alert("❌ ERROR: " + err.message));
 }
@@ -68,12 +68,12 @@ function updateStudent() {
     const id = document.getElementById('studentId').value;
     if (!id || id.trim() === "") { alert("❌ ERROR: Student ID is missing!\n\nPlease click the yellow 'Edit' button next to a student in the table to load their ID before updating."); return; }
     const student = { studentId: id, firstName: document.getElementById('firstName').value, lastName: document.getElementById('lastName').value, major: document.getElementById('major').value, dateOfBirth: "2000-01-01", currentSemester: 1, currentYear: 1, academicStatus: "Active" };
-    fetch(`http://localhost:8080/api/students/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(student) })
+    fetch(`https://srms-web-pci5.onrender.com/api/students/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(student) })
         .then(async res => { if (!res.ok) { if (res.status === 404) throw new Error("Student not found. Did you click 'Generate ID' instead of selecting an existing student from the table?"); const err = await res.json(); throw new Error(err.error || "Failed"); } return res.json(); })
         .then(() => loadStudents()).catch(err => alert("❌ ERROR: " + err.message));
 }
 
-function deleteStudent(id) { if(confirm("Delete this student?")) fetch(`http://localhost:8080/api/students/${id}`, { method: 'DELETE' }).then(() => loadStudents()); }
+function deleteStudent(id) { if(confirm("Delete this student?")) fetch(`https://srms-web-pci5.onrender.com/api/students/${id}`, { method: 'DELETE' }).then(() => loadStudents()); }
 
 function editStudent(id, first, last, major) {
     document.getElementById('studentId').value = id; document.getElementById('studentId').readOnly = true;
@@ -98,7 +98,7 @@ function showStudentProfile(studentId) {
     modalBody.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary"></div><p class="mt-2">Loading...</p></div>';
     const modal = new bootstrap.Modal(document.getElementById('studentProfileModal'));
     modal.show();
-    fetch(`http://localhost:8080/api/reports/transcript/${studentId}`).then(res => res.json()).then(data => {
+    fetch(`https://srms-web-pci5.onrender.com/api/reports/transcript/${studentId}`).then(res => res.json()).then(data => {
         if (data.error) { modalBody.innerHTML = `<div class="alert alert-danger">${data.error}</div>`; return; }
         const s = data.student; const enrollments = data.enrollments; const results = data.results;
         let totalPoints = 0; let count = 0;
@@ -116,7 +116,7 @@ function handleSearch(event) {
         const query = document.getElementById('globalSearch').value.trim();
         if (!query) { loadStudents(); return; }
         showPage('students');
-        fetch(`http://localhost:8080/api/students/search?query=${query}`).then(res => res.json()).then(data => {
+        fetch(`https://srms-web-pci5.onrender.com/api/students/search?query=${query}`).then(res => res.json()).then(data => {
             const table = document.getElementById('studentTable'); table.innerHTML = '';
             if (data.length === 0) table.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">No students found matching "${query}"</td></tr>`;
             else { data.forEach(s => { table.innerHTML += `<tr><td><a href="#" onclick="showStudentProfile('${s.studentId}')" class="text-primary text-decoration-none fw-bold">${s.studentId}</a></td><td>${s.firstName}</td><td>${s.lastName}</td><td>${s.major}</td><td><button class="btn btn-sm btn-warning me-1" onclick="editStudent('${s.studentId}', '${s.firstName}', '${s.lastName}', '${s.major}')">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteStudent('${s.studentId}')">Delete</button></td></tr>`; }); }
@@ -129,41 +129,41 @@ function handleSearch(event) {
 // COURSES
 function loadCourses() {
     resetCourseForm();
-    fetch('http://localhost:8080/api/courses').then(res => res.json()).then(data => {
+    fetch('https://srms-web-pci5.onrender.com/api/courses').then(res => res.json()).then(data => {
         const table = document.getElementById('courseTable'); table.innerHTML = '';
         data.forEach(c => { table.innerHTML += `<tr><td>${c.courseId}</td><td>${c.courseName}</td><td>${c.credits}</td><td>${c.department}</td><td><button class="btn btn-sm btn-warning me-1" onclick="editCourse('${c.courseId}', '${c.courseName}', '${c.credits}', '${c.department}')">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteCourse('${c.courseId}')">Delete</button></td></tr>`; });
     });
 }
-function addCourse() { const c = { courseId: document.getElementById('courseId').value, courseName: document.getElementById('courseName').value, credits: parseInt(document.getElementById('credits').value), department: document.getElementById('department').value }; fetch('http://localhost:8080/api/courses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(c) }).then(() => loadCourses()); }
-function updateCourse() { const id = document.getElementById('courseId').value; const c = { courseId: id, courseName: document.getElementById('courseName').value, credits: parseInt(document.getElementById('credits').value), department: document.getElementById('department').value }; fetch(`http://localhost:8080/api/courses/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(c) }).then(() => loadCourses()); }
-function deleteCourse(id) { if(confirm("Delete this course?")) fetch(`http://localhost:8080/api/courses/${id}`, { method: 'DELETE' }).then(() => loadCourses()); }
+function addCourse() { const c = { courseId: document.getElementById('courseId').value, courseName: document.getElementById('courseName').value, credits: parseInt(document.getElementById('credits').value), department: document.getElementById('department').value }; fetch('https://srms-web-pci5.onrender.com/api/courses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(c) }).then(() => loadCourses()); }
+function updateCourse() { const id = document.getElementById('courseId').value; const c = { courseId: id, courseName: document.getElementById('courseName').value, credits: parseInt(document.getElementById('credits').value), department: document.getElementById('department').value }; fetch(`https://srms-web-pci5.onrender.com/api/courses/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(c) }).then(() => loadCourses()); }
+function deleteCourse(id) { if(confirm("Delete this course?")) fetch(`https://srms-web-pci5.onrender.com/api/courses/${id}`, { method: 'DELETE' }).then(() => loadCourses()); }
 function editCourse(id, name, credits, dept) { document.getElementById('courseId').value = id; document.getElementById('courseId').readOnly = true; document.getElementById('courseName').value = name; document.getElementById('credits').value = credits; document.getElementById('department').value = dept; document.getElementById('addCourseBtn').style.display = 'none'; document.getElementById('updateCourseBtn').style.display = 'inline-block'; document.getElementById('cancelCourseBtn').style.display = 'inline-block'; }
 function resetCourseForm() { document.getElementById('courseId').value = ''; document.getElementById('courseId').readOnly = false; document.getElementById('courseName').value = ''; document.getElementById('credits').value = ''; document.getElementById('department').value = ''; document.getElementById('addCourseBtn').style.display = 'inline-block'; document.getElementById('updateCourseBtn').style.display = 'none'; document.getElementById('cancelCourseBtn').style.display = 'none'; }
 
 // TUTORS
 function loadTutors() {
     resetTutorForm();
-    fetch('http://localhost:8080/api/tutors').then(res => res.json()).then(data => {
+    fetch('https://srms-web-pci5.onrender.com/api/tutors').then(res => res.json()).then(data => {
         const table = document.getElementById('tutorTable'); table.innerHTML = '';
         data.forEach(t => { table.innerHTML += `<tr><td>${t.tutorId}</td><td>${t.firstName}</td><td>${t.lastName}</td><td>${t.department}</td><td><button class="btn btn-sm btn-warning me-1" onclick="editTutor('${t.tutorId}', '${t.firstName}', '${t.lastName}', '${t.department}')">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteTutor('${t.tutorId}')">Delete</button></td></tr>`; });
     });
 }
-function addTutor() { const t = { tutorId: document.getElementById('tutorId').value, firstName: document.getElementById('tutorFirstName').value, lastName: document.getElementById('tutorLastName').value, department: document.getElementById('tutorDepartment').value }; fetch('http://localhost:8080/api/tutors', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(t) }).then(() => loadTutors()); }
-function updateTutor() { const id = document.getElementById('tutorId').value; const t = { tutorId: id, firstName: document.getElementById('tutorFirstName').value, lastName: document.getElementById('tutorLastName').value, department: document.getElementById('tutorDepartment').value }; fetch(`http://localhost:8080/api/tutors/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(t) }).then(() => loadTutors()); }
-function deleteTutor(id) { if(confirm("Delete this tutor?")) fetch(`http://localhost:8080/api/tutors/${id}`, { method: 'DELETE' }).then(() => loadTutors()); }
+function addTutor() { const t = { tutorId: document.getElementById('tutorId').value, firstName: document.getElementById('tutorFirstName').value, lastName: document.getElementById('tutorLastName').value, department: document.getElementById('tutorDepartment').value }; fetch('https://srms-web-pci5.onrender.com/api/tutors', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(t) }).then(() => loadTutors()); }
+function updateTutor() { const id = document.getElementById('tutorId').value; const t = { tutorId: id, firstName: document.getElementById('tutorFirstName').value, lastName: document.getElementById('tutorLastName').value, department: document.getElementById('tutorDepartment').value }; fetch(`https://srms-web-pci5.onrender.com/api/tutors/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(t) }).then(() => loadTutors()); }
+function deleteTutor(id) { if(confirm("Delete this tutor?")) fetch(`https://srms-web-pci5.onrender.com/api/tutors/${id}`, { method: 'DELETE' }).then(() => loadTutors()); }
 function editTutor(id, first, last, dept) { document.getElementById('tutorId').value = id; document.getElementById('tutorId').readOnly = true; document.getElementById('tutorFirstName').value = first; document.getElementById('tutorLastName').value = last; document.getElementById('tutorDepartment').value = dept; document.getElementById('addTutorBtn').style.display = 'none'; document.getElementById('updateTutorBtn').style.display = 'inline-block'; document.getElementById('cancelTutorBtn').style.display = 'inline-block'; }
 function resetTutorForm() { document.getElementById('tutorId').value = ''; document.getElementById('tutorId').readOnly = false; document.getElementById('tutorFirstName').value = ''; document.getElementById('tutorLastName').value = ''; document.getElementById('tutorDepartment').value = ''; document.getElementById('addTutorBtn').style.display = 'inline-block'; document.getElementById('updateTutorBtn').style.display = 'none'; document.getElementById('cancelTutorBtn').style.display = 'none'; }
 
 // ENROLLMENTS
 function loadEnrollmentDropdowns() {
-    fetch('http://localhost:8080/api/students?size=1000').then(res => res.json()).then(data => {
+    fetch('https://srms-web-pci5.onrender.com/api/students?size=1000').then(res => res.json()).then(data => {
         allStudentsCache = data.content;
         const select = document.getElementById('enrollStudentId');
         select.innerHTML = '<option value="">-- Select Student --</option>';
         allStudentsCache.forEach(s => { select.innerHTML += `<option value="${s.studentId}">${s.studentId} - ${s.firstName} ${s.lastName}</option>`; });
         renderBulkCheckboxes(allStudentsCache);
     });
-    fetch('http://localhost:8080/api/courses').then(res => res.json()).then(data => {
+    fetch('https://srms-web-pci5.onrender.com/api/courses').then(res => res.json()).then(data => {
         const select = document.getElementById('enrollCourseId');
         select.innerHTML = '<option value="">-- Select Course --</option>';
         data.forEach(c => { select.innerHTML += `<option value="${c.courseId}">${c.courseId} - ${c.courseName}</option>`; });
@@ -195,7 +195,7 @@ function updateSelectedCount() {
 
 function loadEnrollments() {
     resetEnrollmentForm();
-    fetch('http://localhost:8080/api/enrollments').then(res => res.json()).then(data => {
+    fetch('https://srms-web-pci5.onrender.com/api/enrollments').then(res => res.json()).then(data => {
         const table = document.getElementById('enrollmentTable'); table.innerHTML = '';
         data.forEach(e => { table.innerHTML += `<tr><td>${e.enrollmentId}</td><td>${e.studentId}</td><td>${e.courseId}</td><td>${e.semester}</td><td>${e.year}</td><td>${e.enrollmentDate}</td><td><button class="btn btn-sm btn-warning me-1" onclick="editEnrollment('${e.enrollmentId}', '${e.studentId}', '${e.courseId}', '${e.semester}', '${e.year}')">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteEnrollment('${e.enrollmentId}')">Delete</button></td></tr>`; });
     });
@@ -211,47 +211,47 @@ function bulkEnroll() {
     const enrollmentsList = [];
     const today = new Date().toISOString().split('T')[0];
     checkboxes.forEach(cb => { enrollmentsList.push({ enrollmentId: "ENR" + (Date.now() + Math.floor(Math.random() * 10000)), studentId: cb.value, courseId: courseId, semester: parseInt(semester), year: parseInt(year), enrollmentDate: today }); });
-    fetch('http://localhost:8080/api/enrollments/bulk', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(enrollmentsList) }).then(() => {
+    fetch('https://srms-web-pci5.onrender.com/api/enrollments/bulk', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(enrollmentsList) }).then(() => {
         alert(`✅ Successfully enrolled ${checkboxes.length} students!`);
         document.getElementById('bulkSemester').value = ''; document.getElementById('bulkYear').value = ''; document.getElementById('bulkSearch').value = '';
         loadEnrollments(); renderBulkCheckboxes(allStudentsCache); updateSelectedCount();
     });
 }
 
-function addEnrollment() { const today = new Date().toISOString().split('T')[0]; const e = { enrollmentId: document.getElementById('enrollmentId').value, studentId: document.getElementById('enrollStudentId').value, courseId: document.getElementById('enrollCourseId').value, semester: parseInt(document.getElementById('semester').value), year: parseInt(document.getElementById('year').value), enrollmentDate: today }; fetch('http://localhost:8080/api/enrollments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(e) }).then(() => loadEnrollments()); }
-function updateEnrollment() { const id = document.getElementById('enrollmentId').value; const today = new Date().toISOString().split('T')[0]; const e = { enrollmentId: id, studentId: document.getElementById('enrollStudentId').value, courseId: document.getElementById('enrollCourseId').value, semester: parseInt(document.getElementById('semester').value), year: parseInt(document.getElementById('year').value), enrollmentDate: today }; fetch(`http://localhost:8080/api/enrollments/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(e) }).then(() => loadEnrollments()); }
-function deleteEnrollment(id) { if(confirm("Delete this enrollment?")) fetch(`http://localhost:8080/api/enrollments/${id}`, { method: 'DELETE' }).then(() => loadEnrollments()); }
+function addEnrollment() { const today = new Date().toISOString().split('T')[0]; const e = { enrollmentId: document.getElementById('enrollmentId').value, studentId: document.getElementById('enrollStudentId').value, courseId: document.getElementById('enrollCourseId').value, semester: parseInt(document.getElementById('semester').value), year: parseInt(document.getElementById('year').value), enrollmentDate: today }; fetch('https://srms-web-pci5.onrender.com/api/enrollments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(e) }).then(() => loadEnrollments()); }
+function updateEnrollment() { const id = document.getElementById('enrollmentId').value; const today = new Date().toISOString().split('T')[0]; const e = { enrollmentId: id, studentId: document.getElementById('enrollStudentId').value, courseId: document.getElementById('enrollCourseId').value, semester: parseInt(document.getElementById('semester').value), year: parseInt(document.getElementById('year').value), enrollmentDate: today }; fetch(`https://srms-web-pci5.onrender.com/api/enrollments/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(e) }).then(() => loadEnrollments()); }
+function deleteEnrollment(id) { if(confirm("Delete this enrollment?")) fetch(`https://srms-web-pci5.onrender.com/api/enrollments/${id}`, { method: 'DELETE' }).then(() => loadEnrollments()); }
 function editEnrollment(id, student, course, sem, year) { document.getElementById('enrollmentId').value = id; document.getElementById('enrollmentId').readOnly = true; document.getElementById('enrollStudentId').value = student; document.getElementById('enrollCourseId').value = course; document.getElementById('semester').value = sem; document.getElementById('year').value = year; document.getElementById('addEnrollmentBtn').style.display = 'none'; document.getElementById('updateEnrollmentBtn').style.display = 'inline-block'; document.getElementById('cancelEnrollmentBtn').style.display = 'inline-block'; }
 function resetEnrollmentForm() { document.getElementById('enrollmentId').value = ''; document.getElementById('enrollmentId').readOnly = false; document.getElementById('enrollStudentId').value = ''; document.getElementById('enrollCourseId').value = ''; document.getElementById('semester').value = ''; document.getElementById('year').value = ''; document.getElementById('addEnrollmentBtn').style.display = 'inline-block'; document.getElementById('updateEnrollmentBtn').style.display = 'none'; document.getElementById('cancelEnrollmentBtn').style.display = 'none'; }
 
 // RESULTS
-function loadResultDropdown() { fetch('http://localhost:8080/api/enrollments').then(res => res.json()).then(data => { const select = document.getElementById('resultEnrollmentId'); select.innerHTML = '<option value="">-- Select Enrollment --</option>'; data.forEach(e => { select.innerHTML += `<option value="${e.enrollmentId}">${e.enrollmentId} (Student: ${e.studentId})</option>`; }); }); }
+function loadResultDropdown() { fetch('https://srms-web-pci5.onrender.com/api/enrollments').then(res => res.json()).then(data => { const select = document.getElementById('resultEnrollmentId'); select.innerHTML = '<option value="">-- Select Enrollment --</option>'; data.forEach(e => { select.innerHTML += `<option value="${e.enrollmentId}">${e.enrollmentId} (Student: ${e.studentId})</option>`; }); }); }
 function calculateGrade() { const scoreInput = document.getElementById('score'); const score = parseInt(scoreInput.value); const gradeInput = document.getElementById('grade'); if (isNaN(score)) { gradeInput.value = ""; return; } if (score < 0 || score > 100) { alert("Invalid Score! Score must be between 0 and 100."); scoreInput.value = ""; gradeInput.value = ""; return; } let grade = ""; if (score >= 70) grade = "A"; else if (score >= 60) grade = "B"; else if (score >= 50) grade = "C"; else if (score >= 40) grade = "D"; else grade = "F"; gradeInput.value = grade; }
 function loadResults() {
     resetResultForm();
-    fetch('http://localhost:8080/api/results').then(res => res.json()).then(data => {
+    fetch('https://srms-web-pci5.onrender.com/api/results').then(res => res.json()).then(data => {
         const table = document.getElementById('resultTable'); table.innerHTML = '';
         data.forEach(r => { table.innerHTML += `<tr><td>${r.resultId}</td><td>${r.enrollmentId}</td><td>${r.score}</td><td>${r.grade}</td><td>${r.semester}</td><td>${r.year}</td><td><button class="btn btn-sm btn-warning me-1" onclick="editResult('${r.resultId}', '${r.enrollmentId}', '${r.score}', '${r.grade}', '${r.semester}', '${r.year}')">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteResult('${r.resultId}')">Delete</button></td></tr>`; });
     });
 }
-function addResult() { const r = { resultId: document.getElementById('resultId').value, enrollmentId: document.getElementById('resultEnrollmentId').value, score: parseInt(document.getElementById('score').value), grade: document.getElementById('grade').value, semester: parseInt(document.getElementById('resultSemester').value), year: parseInt(document.getElementById('resultYear').value) }; fetch('http://localhost:8080/api/results', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(r) }).then(() => loadResults()); }
-function updateResult() { const id = document.getElementById('resultId').value; const r = { resultId: id, enrollmentId: document.getElementById('resultEnrollmentId').value, score: parseInt(document.getElementById('score').value), grade: document.getElementById('grade').value, semester: parseInt(document.getElementById('resultSemester').value), year: parseInt(document.getElementById('resultYear').value) }; fetch(`http://localhost:8080/api/results/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(r) }).then(() => loadResults()); }
-function deleteResult(id) { if(confirm("Delete this result?")) fetch(`http://localhost:8080/api/results/${id}`, { method: 'DELETE' }).then(() => loadResults()); }
+function addResult() { const r = { resultId: document.getElementById('resultId').value, enrollmentId: document.getElementById('resultEnrollmentId').value, score: parseInt(document.getElementById('score').value), grade: document.getElementById('grade').value, semester: parseInt(document.getElementById('resultSemester').value), year: parseInt(document.getElementById('resultYear').value) }; fetch('https://srms-web-pci5.onrender.com/api/results', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(r) }).then(() => loadResults()); }
+function updateResult() { const id = document.getElementById('resultId').value; const r = { resultId: id, enrollmentId: document.getElementById('resultEnrollmentId').value, score: parseInt(document.getElementById('score').value), grade: document.getElementById('grade').value, semester: parseInt(document.getElementById('resultSemester').value), year: parseInt(document.getElementById('resultYear').value) }; fetch(`https://srms-web-pci5.onrender.com/api/results/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(r) }).then(() => loadResults()); }
+function deleteResult(id) { if(confirm("Delete this result?")) fetch(`https://srms-web-pci5.onrender.com/api/results/${id}`, { method: 'DELETE' }).then(() => loadResults()); }
 function editResult(id, enrollment, score, grade, sem, year) { document.getElementById('resultId').value = id; document.getElementById('resultId').readOnly = true; document.getElementById('resultEnrollmentId').value = enrollment; document.getElementById('score').value = score; document.getElementById('grade').value = grade; document.getElementById('resultSemester').value = sem; document.getElementById('resultYear').value = year; document.getElementById('addResultBtn').style.display = 'none'; document.getElementById('updateResultBtn').style.display = 'inline-block'; document.getElementById('cancelResultBtn').style.display = 'inline-block'; }
 function resetResultForm() { document.getElementById('resultId').value = ''; document.getElementById('resultId').readOnly = false; document.getElementById('resultEnrollmentId').value = ''; document.getElementById('score').value = ''; document.getElementById('grade').value = ''; document.getElementById('resultSemester').value = ''; document.getElementById('resultYear').value = ''; document.getElementById('addResultBtn').style.display = 'inline-block'; document.getElementById('updateResultBtn').style.display = 'none'; document.getElementById('cancelResultBtn').style.display = 'none'; }
 
 // ALLOCATIONS (UPGRADED)
 function loadAllocationDropdowns() {
-    fetch('http://localhost:8080/api/courses').then(res => res.json()).then(data => { const select = document.getElementById('allocCourseId'); select.innerHTML = '<option value="">-- Select Course --</option>'; data.forEach(c => { select.innerHTML += `<option value="${c.courseId}">${c.courseId} - ${c.courseName}</option>`; }); });
-    fetch('http://localhost:8080/api/tutors').then(res => res.json()).then(data => { const select = document.getElementById('allocTutorId'); select.innerHTML = '<option value="">-- Select Tutor --</option>'; data.forEach(t => { select.innerHTML += `<option value="${t.tutorId}">${t.tutorId} - ${t.firstName} ${t.lastName}</option>`; }); });
+    fetch('https://srms-web-pci5.onrender.com/api/courses').then(res => res.json()).then(data => { const select = document.getElementById('allocCourseId'); select.innerHTML = '<option value="">-- Select Course --</option>'; data.forEach(c => { select.innerHTML += `<option value="${c.courseId}">${c.courseId} - ${c.courseName}</option>`; }); });
+    fetch('https://srms-web-pci5.onrender.com/api/tutors').then(res => res.json()).then(data => { const select = document.getElementById('allocTutorId'); select.innerHTML = '<option value="">-- Select Tutor --</option>'; data.forEach(t => { select.innerHTML += `<option value="${t.tutorId}">${t.tutorId} - ${t.firstName} ${t.lastName}</option>`; }); });
 }
 
 function loadAllocations() {
     resetAllocationForm();
     Promise.all([
-        fetch('http://localhost:8080/api/courses').then(res => res.json()),
-        fetch('http://localhost:8080/api/tutors').then(res => res.json()),
-        fetch('http://localhost:8080/api/allocations').then(res => res.json())
+        fetch('https://srms-web-pci5.onrender.com/api/courses').then(res => res.json()),
+        fetch('https://srms-web-pci5.onrender.com/api/tutors').then(res => res.json()),
+        fetch('https://srms-web-pci5.onrender.com/api/allocations').then(res => res.json())
     ]).then(([courses, tutors, allocations]) => {
         const table = document.getElementById('allocationTable'); table.innerHTML = '';
         allocations.forEach(a => {
@@ -273,18 +273,18 @@ function loadAllocations() {
         });
     });
 }
-function addAllocation() { const a = { allocationId: document.getElementById('allocationId').value, courseId: document.getElementById('allocCourseId').value, tutorId: document.getElementById('allocTutorId').value, semester: parseInt(document.getElementById('allocSemester').value), year: parseInt(document.getElementById('allocYear').value) }; fetch('http://localhost:8080/api/allocations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) }).then(() => loadAllocations()); }
-function updateAllocation() { const id = document.getElementById('allocationId').value; const a = { allocationId: id, courseId: document.getElementById('allocCourseId').value, tutorId: document.getElementById('allocTutorId').value, semester: parseInt(document.getElementById('allocSemester').value), year: parseInt(document.getElementById('allocYear').value) }; fetch(`http://localhost:8080/api/allocations/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) }).then(() => loadAllocations()); }
-function deleteAllocation(id) { if(confirm("Delete this allocation?")) fetch(`http://localhost:8080/api/allocations/${id}`, { method: 'DELETE' }).then(() => loadAllocations()); }
+function addAllocation() { const a = { allocationId: document.getElementById('allocationId').value, courseId: document.getElementById('allocCourseId').value, tutorId: document.getElementById('allocTutorId').value, semester: parseInt(document.getElementById('allocSemester').value), year: parseInt(document.getElementById('allocYear').value) }; fetch('https://srms-web-pci5.onrender.com/api/allocations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) }).then(() => loadAllocations()); }
+function updateAllocation() { const id = document.getElementById('allocationId').value; const a = { allocationId: id, courseId: document.getElementById('allocCourseId').value, tutorId: document.getElementById('allocTutorId').value, semester: parseInt(document.getElementById('allocSemester').value), year: parseInt(document.getElementById('allocYear').value) }; fetch(`https://srms-web-pci5.onrender.com/api/allocations/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) }).then(() => loadAllocations()); }
+function deleteAllocation(id) { if(confirm("Delete this allocation?")) fetch(`https://srms-web-pci5.onrender.com/api/allocations/${id}`, { method: 'DELETE' }).then(() => loadAllocations()); }
 function editAllocation(id, course, tutor, sem, year) { document.getElementById('allocationId').value = id; document.getElementById('allocationId').readOnly = true; document.getElementById('allocCourseId').value = course; document.getElementById('allocTutorId').value = tutor; document.getElementById('allocSemester').value = sem; document.getElementById('allocYear').value = year; document.getElementById('addAllocBtn').style.display = 'none'; document.getElementById('updateAllocBtn').style.display = 'inline-block'; document.getElementById('cancelAllocBtn').style.display = 'inline-block'; }
 function resetAllocationForm() { document.getElementById('allocationId').value = ''; document.getElementById('allocationId').readOnly = false; document.getElementById('allocCourseId').value = ''; document.getElementById('allocTutorId').value = ''; document.getElementById('allocSemester').value = ''; document.getElementById('allocYear').value = ''; document.getElementById('addAllocBtn').style.display = 'inline-block'; document.getElementById('updateAllocBtn').style.display = 'none'; document.getElementById('cancelAllocBtn').style.display = 'none'; }
 
 // REPORTS
-function loadReportDropdown() { fetch('http://localhost:8080/api/students?size=2000').then(res => res.json()).then(data => { const select = document.getElementById('reportStudentSelect'); select.innerHTML = '<option value="">-- Select a Student --</option>'; data.content.forEach(s => { select.innerHTML += `<option value="${s.studentId}">${s.studentId} - ${s.firstName} ${s.lastName}</option>`; }); }); }
+function loadReportDropdown() { fetch('https://srms-web-pci5.onrender.com/api/students?size=2000').then(res => res.json()).then(data => { const select = document.getElementById('reportStudentSelect'); select.innerHTML = '<option value="">-- Select a Student --</option>'; data.content.forEach(s => { select.innerHTML += `<option value="${s.studentId}">${s.studentId} - ${s.firstName} ${s.lastName}</option>`; }); }); }
 function generateTranscript() {
     const studentId = document.getElementById('reportStudentSelect').value; if (!studentId) { alert("Please select a student first!"); return; }
     const outputDiv = document.getElementById('transcriptOutput'); outputDiv.innerHTML = '<p>Loading transcript...</p>';
-    fetch(`http://localhost:8080/api/reports/transcript/${studentId}`).then(res => res.json()).then(data => {
+    fetch(`https://srms-web-pci5.onrender.com/api/reports/transcript/${studentId}`).then(res => res.json()).then(data => {
         if (data.error) { outputDiv.innerHTML = `<p style="color:red;">${data.error}</p>`; return; }
         const s = data.student; const enrollments = data.enrollments; const results = data.results;
         let html = `<div class="transcript-card"><div class="student-header"><h3>${s.firstName} ${s.lastName}</h3><p>ID: ${s.studentId} | Major: ${s.major}</p></div><table class="table table-bordered"><thead><tr><th>Course ID</th><th>Enrollment ID</th><th>Semester</th><th>Year</th><th>Score</th><th>Grade</th></tr></thead><tbody>`;
@@ -300,10 +300,10 @@ function generateTranscript() {
         html += `</div>`; outputDiv.innerHTML = html;
     });
 }
-function downloadPdf() { const studentId = document.getElementById('reportStudentSelect').value; if (!studentId) { alert("Please select a student first!"); return; } window.location.href = `http://localhost:8080/api/reports/transcript/${studentId}/pdf`; }
+function downloadPdf() { const studentId = document.getElementById('reportStudentSelect').value; if (!studentId) { alert("Please select a student first!"); return; } window.location.href = `https://srms-web-pci5.onrender.com/api/reports/transcript/${studentId}/pdf`; }
 
 // CHARTS
 function loadCharts() {
-    fetch('http://localhost:8080/api/students/stats/majors').then(res => res.json()).then(data => { if (majorChartInstance) majorChartInstance.destroy(); majorChartInstance = new Chart(document.getElementById('majorChart').getContext('2d'), { type: 'pie', data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: ['#38bdf8', '#28a745', '#f39c12', '#e74c3c', '#8e44ad', '#34495e'] }] }, options: { responsive: true, maintainAspectRatio: false } }); });
-    fetch('http://localhost:8080/api/enrollments/stats/semesters').then(res => res.json()).then(data => { if (semesterChartInstance) semesterChartInstance.destroy(); semesterChartInstance = new Chart(document.getElementById('semesterChart').getContext('2d'), { type: 'bar', data: { labels: Object.keys(data), datasets: [{ label: 'Enrollments', data: Object.values(data), backgroundColor: '#1e293b' }] }, options: { responsive: true, maintainAspectRatio: false } }); });
+    fetch('https://srms-web-pci5.onrender.com/api/students/stats/majors').then(res => res.json()).then(data => { if (majorChartInstance) majorChartInstance.destroy(); majorChartInstance = new Chart(document.getElementById('majorChart').getContext('2d'), { type: 'pie', data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: ['#38bdf8', '#28a745', '#f39c12', '#e74c3c', '#8e44ad', '#34495e'] }] }, options: { responsive: true, maintainAspectRatio: false } }); });
+    fetch('https://srms-web-pci5.onrender.com/api/enrollments/stats/semesters').then(res => res.json()).then(data => { if (semesterChartInstance) semesterChartInstance.destroy(); semesterChartInstance = new Chart(document.getElementById('semesterChart').getContext('2d'), { type: 'bar', data: { labels: Object.keys(data), datasets: [{ label: 'Enrollments', data: Object.values(data), backgroundColor: '#1e293b' }] }, options: { responsive: true, maintainAspectRatio: false } }); });
 }
