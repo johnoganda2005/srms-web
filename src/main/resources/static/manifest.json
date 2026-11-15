@@ -1,0 +1,16 @@
+{
+  "name": "Chuka SRMS",
+  "short_name": "SRMS",
+  "description": "Student Records Management System",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0D2954",
+  "theme_color": "#1D283A",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2942/2942156.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
