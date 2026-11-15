@@ -1,6 +1,4 @@
 target/
+.mvn/
 .idea/
 *.iml
-.mvn/
-mvnw
-mvnw.cmd
