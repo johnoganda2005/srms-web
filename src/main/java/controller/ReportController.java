@@ -38,15 +38,17 @@ public class ReportController {
     @GetMapping("/transcript/{studentId}")
     public Map<String, Object> getTranscript(@PathVariable String studentId) {
         Map<String, Object> response = new HashMap<>();
-
-        Optional<Student> student = studentRepo.findById(studentId);
-        if (student.isEmpty()) {
-            response.put("error", "Student not found");
+        
+        Optional<Student> studentOpt = studentRepo.findById(studentId);
+        if (studentOpt.isEmpty()) {
+            response.put("error", "Student not found in database");
             return response;
         }
 
-        response.put("student", student.get());
-
+        Student student = studentOpt.get();
+        response.put("student", student);
+        
+        // Get all enrollments for this student
         List<Enrollment> allEnrollments = enrollmentRepo.findAll();
         List<Enrollment> studentEnrollments = new ArrayList<>();
         for (Enrollment e : allEnrollments) {
@@ -56,6 +58,7 @@ public class ReportController {
         }
         response.put("enrollments", studentEnrollments);
 
+        // Get all results for these enrollments
         List<ExaminationResult> allResults = resultRepo.findAll();
         List<ExaminationResult> studentResults = new ArrayList<>();
         for (ExaminationResult r : allResults) {
@@ -78,11 +81,11 @@ public class ReportController {
             response.sendError(404, "Student not found");
             return;
         }
-
+        
         Student student = (Student) data.get("student");
         List<Enrollment> enrollments = (List<Enrollment>) data.get("enrollments");
         List<ExaminationResult> results = (List<ExaminationResult>) data.get("results");
-
+        
         pdfService.exportTranscriptToPdf(student, enrollments, results, response);
     }
 }
