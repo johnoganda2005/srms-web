@@ -1,7 +1,26 @@
+// --- MOBILE SIDEBAR LOGIC ---
 function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('show');
-    document.getElementById('sidebarOverlay').classList.toggle('show');
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    
+    if (sidebar) sidebar.classList.toggle('show');
+    if (overlay) overlay.classList.toggle('show');
 }
+
+// Close sidebar when a link is clicked on mobile
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.sidebar a').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                const sidebar = document.querySelector('.sidebar');
+                const overlay = document.querySelector('.sidebar-overlay');
+                if (sidebar) sidebar.classList.remove('show');
+                if (overlay) overlay.classList.remove('show');
+            }
+        });
+    });
+});
+
 let currentPage = 0;
 let totalPages = 1;
 let majorChartInstance = null;
@@ -253,7 +272,7 @@ function deleteResult(id) { if(confirm("Delete this result?")) fetch(`https://sr
 function editResult(id, enrollment, score, grade, sem, year) { document.getElementById('resultId').value = id; document.getElementById('resultId').readOnly = true; document.getElementById('resultEnrollmentId').value = enrollment; document.getElementById('score').value = score; document.getElementById('grade').value = grade; document.getElementById('resultSemester').value = sem; document.getElementById('resultYear').value = year; document.getElementById('addResultBtn').style.display = 'none'; document.getElementById('updateResultBtn').style.display = 'inline-block'; document.getElementById('cancelResultBtn').style.display = 'inline-block'; }
 function resetResultForm() { document.getElementById('resultId').value = ''; document.getElementById('resultId').readOnly = false; document.getElementById('resultEnrollmentId').value = ''; document.getElementById('score').value = ''; document.getElementById('grade').value = ''; document.getElementById('resultSemester').value = ''; document.getElementById('resultYear').value = ''; document.getElementById('addResultBtn').style.display = 'inline-block'; document.getElementById('updateResultBtn').style.display = 'none'; document.getElementById('cancelResultBtn').style.display = 'none'; }
 
-// ALLOCATIONS (UPGRADED)
+// ALLOCATIONS
 function loadAllocationDropdowns() {
     fetch('https://srms-web-pci5.onrender.com/api/courses').then(res => res.json()).then(data => { const select = document.getElementById('allocCourseId'); select.innerHTML = '<option value="">-- Select Course --</option>'; data.forEach(c => { select.innerHTML += `<option value="${c.courseId}">${c.courseId} - ${c.courseName}</option>`; }); });
     fetch('https://srms-web-pci5.onrender.com/api/tutors').then(res => res.json()).then(data => { const select = document.getElementById('allocTutorId'); select.innerHTML = '<option value="">-- Select Tutor --</option>'; data.forEach(t => { select.innerHTML += `<option value="${t.tutorId}">${t.tutorId} - ${t.firstName} ${t.lastName}</option>`; }); });
@@ -319,90 +338,4 @@ function downloadPdf() { const studentId = document.getElementById('reportStuden
 function loadCharts() {
     fetch('https://srms-web-pci5.onrender.com/api/students/stats/majors').then(res => res.json()).then(data => { if (majorChartInstance) majorChartInstance.destroy(); majorChartInstance = new Chart(document.getElementById('majorChart').getContext('2d'), { type: 'pie', data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: ['#38bdf8', '#28a745', '#f39c12', '#e74c3c', '#8e44ad', '#34495e'] }] }, options: { responsive: true, maintainAspectRatio: false } }); });
     fetch('https://srms-web-pci5.onrender.com/api/enrollments/stats/semesters').then(res => res.json()).then(data => { if (semesterChartInstance) semesterChartInstance.destroy(); semesterChartInstance = new Chart(document.getElementById('semesterChart').getContext('2d'), { type: 'bar', data: { labels: Object.keys(data), datasets: [{ label: 'Enrollments', data: Object.values(data), backgroundColor: '#1e293b' }] }, options: { responsive: true, maintainAspectRatio: false } }); });
-}
-// --- MOBILE SIDEBAR LOGIC ---
-function toggleSidebar() {
-    const sidebar = document.querySelector('.sidebar');
-    const overlay = document.querySelector('.sidebar-overlay');
-    
-    sidebar.classList.toggle('active');
-    if (overlay) {
-        overlay.classList.toggle('active');
-    }
-}
-
-// Close sidebar when a link is clicked (on mobile)
-document.querySelectorAll('.sidebar a').forEach(link => {
-    link.addEventListener('click', () => {
-        if (window.innerWidth <= 768) {
-            const sidebar = document.querySelector('.sidebar');
-            const overlay = document.querySelector('.sidebar-overlay');
-            sidebar.classList.remove('active');
-            if (overlay) overlay.classList.remove('active');
-        }
-    });
-});
-// Close sidebar when a link is clicked on mobile
-document.querySelectorAll('.sidebar a').forEach(link => {
-    link.addEventListener('click', () => {
-        if (window.innerWidth <= 768) {
-            document.querySelector('.sidebar').classList.remove('active');
-        }
-    });
-});
-function showStudentProfile(studentId) {
-    const modalBody = document.getElementById('profileModalBody');
-    modalBody.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary"></div><p class="mt-2">Loading profile...</p></div>';
-    
-    const modal = new bootstrap.Modal(document.getElementById('studentProfileModal'));
-    modal.show();
-
-    fetch(`http://localhost:8080/api/reports/transcript/${studentId}`).then(res => res.json()).then(data => {
-        if (data.error) { modalBody.innerHTML = `<div class="alert alert-danger">${data.error}</div>`; return; }
-        
-        const s = data.student; const enrollments = data.enrollments; const results = data.results;
-        let totalPoints = 0; let count = 0;
-        
-        enrollments.forEach(e => { 
-            const result = results.find(r => r.enrollmentId === e.enrollmentId); 
-            if (result) { 
-                if (result.grade === "A") totalPoints += 4.0; 
-                else if (result.grade === "B") totalPoints += 3.0; 
-                else if (result.grade === "C") totalPoints += 2.0; 
-                else if (result.grade === "D") totalPoints += 1.0; 
-                count++; 
-            } 
-        });
-        
-        const gpa = count > 0 ? (totalPoints / count).toFixed(2) : "N/A";
-        
-        let html = `<div class="row mb-4">
-            <div class="col-md-8">
-                <h3>${s.firstName} ${s.lastName}</h3>
-                <p class="text-muted mb-1"><strong>ID:</strong> ${s.studentId}</p>
-                <p class="text-muted mb-1"><strong>Major:</strong> ${s.major}</p>
-                <p class="text-muted"><strong>Status:</strong> <span class="badge bg-success">${s.academicStatus}</span></p>
-            </div>
-            <div class="col-md-4 text-center">
-                <div class="p-3 bg-light rounded shadow-sm">
-                    <h5 class="text-muted mb-1">Cumulative GPA</h5>
-                    <h1 class="text-success fw-bold mb-0">${gpa}</h1>
-                </div>
-            </div>
-        </div>
-        <h5 class="border-bottom pb-2">Enrolled Courses</h5>
-        <table class="table table-sm table-striped mt-2">
-            <thead><tr><th>Course ID</th><th>Semester</th><th>Score</th><th>Grade</th></tr></thead>
-            <tbody>`;
-            
-        if (enrollments.length === 0) html += `<tr><td colspan="4" class="text-center text-muted">No enrollments.</td></tr>`;
-        else { 
-            enrollments.forEach(e => { 
-                const result = results.find(r => r.enrollmentId === e.enrollmentId); 
-                html += `<tr><td>${e.courseId}</td><td>Sem ${e.semester} (${e.year})</td><td>${result ? result.score : '-'}</td><td>${result ? `<span class="badge ${result.grade === 'F' ? 'bg-danger' : 'bg-primary'}">${result.grade}</span>` : '-'}</td></tr>`; 
-            }); 
-        }
-        html += `</tbody></table>`;
-        modalBody.innerHTML = html;
-    });
 }
