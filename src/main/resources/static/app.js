@@ -323,3 +323,15 @@ document.querySelectorAll('.sidebar a').forEach(link => {
         }
     });
 });
+function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('active');
+}
+
+// Close sidebar when a link is clicked on mobile
+document.querySelectorAll('.sidebar a').forEach(link => {
+    link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+            document.querySelector('.sidebar').classList.remove('active');
+        }
+    });
+});
