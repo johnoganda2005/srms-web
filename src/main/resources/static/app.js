@@ -1,3 +1,7 @@
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('show');
+    document.getElementById('sidebarOverlay').classList.toggle('show');
+}
 let currentPage = 0;
 let totalPages = 1;
 let majorChartInstance = null;
