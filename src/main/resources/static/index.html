@@ -82,6 +82,32 @@
                 height: 100vh !important;
                 position: fixed !important;
             }
+                            /* Fix for mobile tables */
+            .table-responsive {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            table {
+                width: 100% !important;
+                min-width: 500px; /* Forces the table to be wide enough so buttons don't stack */
+            }
+            table td, table th {
+                white-space: nowrap; /* Prevents text from wrapping weirdly */
+                vertical-align: middle;
+            }
+            /* Make buttons smaller on mobile */
+            table .btn {
+                padding: 4px 8px !important;
+                font-size: 11px !important;
+                display: inline-block !important;
+                margin: 0 2px !important;
+            }
+            /* Optional: Hide the text in the buttons and just show icons to save space */
+            table .btn i {
+                margin-right: 0 !important;
+            }
             
             /* Class to open the sidebar */
             .sidebar.active {
