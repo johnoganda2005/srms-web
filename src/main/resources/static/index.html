@@ -70,69 +70,61 @@
     backdrop-filter: blur(2px);
 }
 
-        /* Mobile Responsiveness */
-             /* Mobile Responsiveness */
+              /* Mobile Responsiveness (Hamburger Drawer) */
         @media (max-width: 768px) {
-            body {
-                padding: 0 !important;
-                margin: 0 !important;
-            }
+            body { padding: 0 !important; margin: 0 !important; }
+            
+            /* Hide the sidebar off-screen by default */
             .sidebar {
-                width: 120px !important; /* Shrinks sidebar to fit on phones */
+                left: -260px !important; 
+                transition: left 0.3s ease-in-out;
+                width: 260px !important;
                 height: 100vh !important;
                 position: fixed !important;
-                padding-top: 10px !important;
             }
-            .sidebar h3 {
-                font-size: 16px;
-                margin-bottom: 15px;
+            
+            /* Class to open the sidebar */
+            .sidebar.active {
+                left: 0 !important;
             }
-            .sidebar a {
-                padding: 12px 10px !important;
-                font-size: 12px !important; /* Smaller text to fit */
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                border-left: 3px solid transparent;
-            }
-            .sidebar a.active {
-                border-left: 3px solid #38bdf8;
-                border-bottom: none;
-            }
-            .sidebar a i {
-                margin-right: 0 !important;
-                margin-bottom: 5px;
-                font-size: 18px;
-            }
+            
             .main-content {
-                margin-left: 120px !important; /* Push content right, past the sidebar */
-                padding: 10px !important;
-            }
-            .top-navbar {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
+                margin-left: 0 !important;
                 padding: 15px !important;
             }
-            .top-navbar .d-flex {
+            
+            /* Add the hamburger button to the top navbar */
+            .hamburger-btn {
+                display: block !important;
+                background: #1e293b;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 8px 12px;
+                font-size: 20px;
+                cursor: pointer;
+                margin-right: 15px;
+            }
+            
+            /* Adjust top navbar for mobile */
+            .top-navbar {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
                 flex-wrap: wrap;
-                width: 100%;
+                gap: 10px;
+                padding: 10px !important;
             }
             .top-navbar .input-group {
                 width: 100% !important;
+                margin-top: 10px;
             }
-            .card-body {
-                padding: 10px !important;
-            }
-            .table-responsive {
-                overflow-x: auto;
-            }
-            table {
-                font-size: 12px;
-            }
+            
+            .card-body { padding: 15px !important; }
+            .table-responsive { overflow-x: auto; }
+            table { font-size: 12px; }
         }
-     
         .student-checkbox-label:hover { background-color: #e2e8f0 !important; }
     </style>
 </head>
@@ -158,6 +150,7 @@
 
 <div class="main-content">
     <div class="top-navbar">
+        <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>   
         <h4 id="pageTitle" class="mb-0 fw-bold text-dark">Student Management</h4>
         <div class="d-flex align-items-center gap-3">
             <div class="input-group" id="searchContainer" style="width: 300px; display: flex;">
