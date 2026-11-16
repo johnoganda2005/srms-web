@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; overflow-x: hidden; display: flex; flex-direction: column; min-height: 100vh; }
         
         /* Desktop Sidebar */
         .sidebar { height: 100vh; width: 260px; position: fixed; top: 0; left: 0; background-color: #1e293b; color: white; padding-top: 20px; z-index: 1000; overflow-y: auto; }
@@ -19,7 +19,7 @@
         .sidebar a i { margin-right: 15px; width: 20px; text-align: center; }
 
         /* Main Content */
-        .main-content { margin-left: 260px; padding: 20px 40px; }
+        .main-content { margin-left: 260px; padding: 20px 40px; flex: 1; }
         .top-navbar { background: white; padding: 15px 30px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
         
         /* Cards & Tables */
@@ -33,6 +33,9 @@
         
         /* Chart Container */
         .chart-container { position: relative; height: 300px; width: 100%; }
+
+        /* Footer */
+        .app-footer { text-align: center; padding: 20px; color: #64748b; font-size: 14px; margin-top: auto; border-top: 1px solid #e2e8f0; }
 
         /* Mobile Hamburger Menu */
         .mobile-menu-btn {
@@ -329,6 +332,11 @@
                 </div>
             </div>
         </div>
+        
+        <!-- FOOTER -->
+        <footer class="app-footer">
+            &copy; 2026 Chuka University SRMS. All rights reserved.
+        </footer>
     </div>
 
     <script src="app.js"></script>
