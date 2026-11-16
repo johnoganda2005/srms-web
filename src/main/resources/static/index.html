@@ -70,55 +70,18 @@
     backdrop-filter: blur(2px);
 }
 
-@media (max-width: 768px) {
-    /* Show hamburger button on mobile */
-    .hamburger-btn {
-        display: block;
-    }
-
-    /* Move sidebar off-screen by default */
-    .sidebar {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease-in-out;
-        width: 260px; /* Restore original width for the slide-out menu */
-        height: 100vh;
-        position: fixed;
-    }
-
-    /* Slide it in when the 'open' class is added */
-    .sidebar.open {
-        transform: translateX(0);
-        z-index: 1002;
-    }
-
-    .sidebar-overlay.open {
-        display: block;
-    }
-
-    /* Push content down so the hamburger doesn't overlap the top bar */
-    .top-navbar {
-        margin-top: 50px; 
-    }
-
-    /* Undo the previous mobile CSS that made the menu horizontal */
-    .sidebar a {
-        display: block;
-        border-left: 4px solid transparent;
-        border-bottom: none;
-        padding: 15px 25px;
-    }
-    .sidebar a.active {
-        border-left: 4px solid #38bdf8;
-        border-bottom: none;
-    }
-}
-                /* Mobile Responsiveness */
+        /* Mobile Responsiveness */
         @media (max-width: 768px) {
+            body {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
             .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                padding-bottom: 10px;
+                width: 100% !important;
+                height: auto !important;
+                position: relative !important;
+                padding-bottom: 10px !important;
+                border-radius: 0 !important;
             }
             .sidebar h3 {
                 margin-bottom: 15px;
@@ -138,13 +101,14 @@
                 margin-right: 5px;
             }
             .main-content {
-                margin-left: 0;
-                padding: 10px;
+                margin-left: 0 !important;
+                padding: 10px !important;
             }
             .top-navbar {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 10px;
+                padding: 15px !important;
             }
             .top-navbar .d-flex {
                 flex-wrap: wrap;
@@ -154,7 +118,7 @@
                 width: 100% !important;
             }
             .card-body {
-                padding: 10px;
+                padding: 15px !important;
             }
             .table-responsive {
                 overflow-x: auto;
@@ -162,7 +126,8 @@
             table {
                 font-size: 12px;
             }
-                          }
+        }
+     
         .student-checkbox-label:hover { background-color: #e2e8f0 !important; }
     </style>
 </head>
