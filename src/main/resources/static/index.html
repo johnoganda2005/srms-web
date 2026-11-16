@@ -69,35 +69,51 @@
     z-index: 1001;
     backdrop-filter: blur(2px);
 }
+        /* Mobile Responsiveness */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 2000;
+            background: #1e293b;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 20px;
+            cursor: pointer;
+        }
 
-              /* Mobile Responsiveness (Hamburger Drawer) */
-              @media (max-width: 768px) {
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
             .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                padding-bottom: 10px;
+                width: 250px;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
             }
-            .sidebar h3 {
-                margin-bottom: 15px;
-                font-size: 20px;
+            .sidebar.active {
+                transform: translateX(0);
             }
-            .sidebar a {
-                display: inline-block;
-                padding: 10px 15px;
-                border-left: none;
-                border-bottom: 2px solid transparent;
-                font-size: 14px;
-            }
-            .sidebar a.active {
-                border-bottom: 2px solid #38bdf8;
-            }
-            .sidebar a i {
-                margin-right: 5px;
+            .sidebar-overlay.active {
+                display: block;
             }
             .main-content {
                 margin-left: 0;
-                padding: 10px;
+                padding: 60px 15px 15px 15px;
             }
             .top-navbar {
                 flex-direction: column;
@@ -112,15 +128,15 @@
                 width: 100% !important;
             }
             .card-body {
-                padding: 10px;
+                padding: 15px;
             }
             .table-responsive {
                 overflow-x: auto;
-                -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+                -webkit-overflow-scrolling: touch;
             }
             table {
                 font-size: 12px;
-                white-space: nowrap; /* Prevents text from breaking into multiple lines */
+                white-space: nowrap;
             }
         }
         .student-checkbox-label:hover { background-color: #e2e8f0 !important; }
@@ -128,7 +144,7 @@
 </head>
 <body>
         <!-- Hamburger Button -->
-<button class="hamburger-btn" onclick="toggleSidebar()">
+<button class="mobile-menu-btn" onclick="toggleSidebar()">
     <i class="fas fa-bars"></i>
 </button>
 
