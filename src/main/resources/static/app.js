@@ -316,26 +316,28 @@ function loadCharts() {
     fetch('https://srms-web-pci5.onrender.com/api/students/stats/majors').then(res => res.json()).then(data => { if (majorChartInstance) majorChartInstance.destroy(); majorChartInstance = new Chart(document.getElementById('majorChart').getContext('2d'), { type: 'pie', data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: ['#38bdf8', '#28a745', '#f39c12', '#e74c3c', '#8e44ad', '#34495e'] }] }, options: { responsive: true, maintainAspectRatio: false } }); });
     fetch('https://srms-web-pci5.onrender.com/api/enrollments/stats/semesters').then(res => res.json()).then(data => { if (semesterChartInstance) semesterChartInstance.destroy(); semesterChartInstance = new Chart(document.getElementById('semesterChart').getContext('2d'), { type: 'bar', data: { labels: Object.keys(data), datasets: [{ label: 'Enrollments', data: Object.values(data), backgroundColor: '#1e293b' }] }, options: { responsive: true, maintainAspectRatio: false } }); });
 }
+// --- MOBILE SIDEBAR LOGIC ---
 function toggleSidebar() {
     const sidebar = document.querySelector('.sidebar');
     const overlay = document.querySelector('.sidebar-overlay');
     
-    sidebar.classList.toggle('open');
-    overlay.classList.toggle('open');
+    sidebar.classList.toggle('active');
+    if (overlay) {
+        overlay.classList.toggle('active');
+    }
 }
 
-// Optional: Close the menu automatically when a link is clicked
+// Close sidebar when a link is clicked (on mobile)
 document.querySelectorAll('.sidebar a').forEach(link => {
     link.addEventListener('click', () => {
         if (window.innerWidth <= 768) {
-            toggleSidebar();
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            sidebar.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
         }
     });
 });
-function toggleSidebar() {
-    document.querySelector('.sidebar').classList.toggle('active');
-}
-
 // Close sidebar when a link is clicked on mobile
 document.querySelectorAll('.sidebar a').forEach(link => {
     link.addEventListener('click', () => {
