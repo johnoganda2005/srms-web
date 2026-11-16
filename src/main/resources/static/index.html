@@ -71,37 +71,42 @@
 }
 
         /* Mobile Responsiveness */
+             /* Mobile Responsiveness */
         @media (max-width: 768px) {
             body {
                 padding: 0 !important;
                 margin: 0 !important;
             }
             .sidebar {
-                width: 100% !important;
-                height: auto !important;
-                position: relative !important;
-                padding-bottom: 10px !important;
-                border-radius: 0 !important;
+                width: 120px !important; /* Shrinks sidebar to fit on phones */
+                height: 100vh !important;
+                position: fixed !important;
+                padding-top: 10px !important;
             }
             .sidebar h3 {
+                font-size: 16px;
                 margin-bottom: 15px;
-                font-size: 20px;
             }
             .sidebar a {
-                display: inline-block;
-                padding: 10px 15px;
-                border-left: none;
-                border-bottom: 2px solid transparent;
-                font-size: 14px;
+                padding: 12px 10px !important;
+                font-size: 12px !important; /* Smaller text to fit */
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                border-left: 3px solid transparent;
             }
             .sidebar a.active {
-                border-bottom: 2px solid #38bdf8;
+                border-left: 3px solid #38bdf8;
+                border-bottom: none;
             }
             .sidebar a i {
-                margin-right: 5px;
+                margin-right: 0 !important;
+                margin-bottom: 5px;
+                font-size: 18px;
             }
             .main-content {
-                margin-left: 0 !important;
+                margin-left: 120px !important; /* Push content right, past the sidebar */
                 padding: 10px !important;
             }
             .top-navbar {
@@ -118,7 +123,7 @@
                 width: 100% !important;
             }
             .card-body {
-                padding: 15px !important;
+                padding: 10px !important;
             }
             .table-responsive {
                 overflow-x: auto;
