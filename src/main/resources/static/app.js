@@ -45,9 +45,11 @@ function loadStudents() {
     fetch(`https://srms-web-pci5.onrender.com/api/students?page=${currentPage}&size=10`).then(res => res.json()).then(data => {
         const table = document.getElementById('studentTable');
         table.innerHTML = '';
+        
         data.content.forEach(s => {
             table.innerHTML += `<tr><td><a href="#" onclick="showStudentProfile('${s.studentId}')" class="text-primary text-decoration-none fw-bold">${s.studentId}</a></td><td>${s.firstName}</td><td>${s.lastName}</td><td>${s.major}</td><td><button class="btn btn-sm btn-warning me-1" onclick="editStudent('${s.studentId}', '${s.firstName}', '${s.lastName}', '${s.major}')"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-sm btn-danger" onclick="deleteStudent('${s.studentId}')"><i class="fas fa-trash"></i> Delete</button></td></tr>`;
         });
+        
         totalPages = data.totalPages;
         document.getElementById('pageInfo').innerText = `Page ${currentPage + 1} of ${Math.max(1, totalPages)}`;
         document.getElementById('prevBtn').disabled = (currentPage === 0);
@@ -56,12 +58,19 @@ function loadStudents() {
 }
 
 function changePage(direction) { currentPage += direction; loadStudents(); }
-
 function addStudent() {
     const student = { studentId: document.getElementById('studentId').value, firstName: document.getElementById('firstName').value, lastName: document.getElementById('lastName').value, major: document.getElementById('major').value, dateOfBirth: "2000-01-01", currentSemester: 1, currentYear: 1, academicStatus: "Active" };
-    fetch('https://srms-web-pci5.onrender.com/api/students', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(student) })
-        .then(async res => { if (!res.ok) { const err = await res.json(); throw new Error(err.error || "Failed"); } return res.json(); })
-        .then(() => loadStudents()).catch(err => alert("❌ ERROR: " + err.message));
+    
+    fetch('http://localhost:8080/api/students', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(student) })
+    .then(async res => { 
+        if (!res.ok) { 
+            const err = await res.json(); 
+            throw new Error(err.error || "Failed to save"); 
+        } 
+        return res.json(); 
+    })
+    .then(() => loadStudents())
+    .catch(err => alert("❌ ERROR: " + err.message));
 }
 
 function updateStudent() {
@@ -335,3 +344,59 @@ document.querySelectorAll('.sidebar a').forEach(link => {
         }
     });
 });
+function showStudentProfile(studentId) {
+    const modalBody = document.getElementById('profileModalBody');
+    modalBody.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary"></div><p class="mt-2">Loading profile...</p></div>';
+    
+    const modal = new bootstrap.Modal(document.getElementById('studentProfileModal'));
+    modal.show();
+
+    fetch(`http://localhost:8080/api/reports/transcript/${studentId}`).then(res => res.json()).then(data => {
+        if (data.error) { modalBody.innerHTML = `<div class="alert alert-danger">${data.error}</div>`; return; }
+        
+        const s = data.student; const enrollments = data.enrollments; const results = data.results;
+        let totalPoints = 0; let count = 0;
+        
+        enrollments.forEach(e => { 
+            const result = results.find(r => r.enrollmentId === e.enrollmentId); 
+            if (result) { 
+                if (result.grade === "A") totalPoints += 4.0; 
+                else if (result.grade === "B") totalPoints += 3.0; 
+                else if (result.grade === "C") totalPoints += 2.0; 
+                else if (result.grade === "D") totalPoints += 1.0; 
+                count++; 
+            } 
+        });
+        
+        const gpa = count > 0 ? (totalPoints / count).toFixed(2) : "N/A";
+        
+        let html = `<div class="row mb-4">
+            <div class="col-md-8">
+                <h3>${s.firstName} ${s.lastName}</h3>
+                <p class="text-muted mb-1"><strong>ID:</strong> ${s.studentId}</p>
+                <p class="text-muted mb-1"><strong>Major:</strong> ${s.major}</p>
+                <p class="text-muted"><strong>Status:</strong> <span class="badge bg-success">${s.academicStatus}</span></p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="p-3 bg-light rounded shadow-sm">
+                    <h5 class="text-muted mb-1">Cumulative GPA</h5>
+                    <h1 class="text-success fw-bold mb-0">${gpa}</h1>
+                </div>
+            </div>
+        </div>
+        <h5 class="border-bottom pb-2">Enrolled Courses</h5>
+        <table class="table table-sm table-striped mt-2">
+            <thead><tr><th>Course ID</th><th>Semester</th><th>Score</th><th>Grade</th></tr></thead>
+            <tbody>`;
+            
+        if (enrollments.length === 0) html += `<tr><td colspan="4" class="text-center text-muted">No enrollments.</td></tr>`;
+        else { 
+            enrollments.forEach(e => { 
+                const result = results.find(r => r.enrollmentId === e.enrollmentId); 
+                html += `<tr><td>${e.courseId}</td><td>Sem ${e.semester} (${e.year})</td><td>${result ? result.score : '-'}</td><td>${result ? `<span class="badge ${result.grade === 'F' ? 'bg-danger' : 'bg-primary'}">${result.grade}</span>` : '-'}</td></tr>`; 
+            }); 
+        }
+        html += `</tbody></table>`;
+        modalBody.innerHTML = html;
+    });
+}
