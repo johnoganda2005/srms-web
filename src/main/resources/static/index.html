@@ -34,25 +34,7 @@
         /* Chart Container */
         .chart-container { position: relative; height: 300px; width: 100%; }
 
-        /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-            .sidebar { width: 100%; height: auto; position: relative; padding-bottom: 10px; }
-            .sidebar h3 { margin-bottom: 15px; font-size: 20px; }
-            .sidebar a { display: inline-block; padding: 10px 15px; border-left: none; border-bottom: 2px solid transparent; font-size: 14px; }
-            .sidebar a.active { border-bottom: 2px solid #38bdf8; }
-            .sidebar a i { margin-right: 5px; }
-            
-            .main-content { margin-left: 0; padding: 10px; }
-            .top-navbar { flex-direction: column; align-items: flex-start; gap: 10px; padding: 15px; }
-            .top-navbar .d-flex { flex-wrap: wrap; width: 100%; }
-            .top-navbar .input-group { width: 100% !important; margin-bottom: 10px; }
-            .card-body { padding: 15px; }
-            
-            /* Make tables scrollable horizontally */
-            .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-            table { font-size: 13px; white-space: nowrap; }
-        }
-                /* Mobile Hamburger Menu */
+        /* Mobile Hamburger Menu */
         .mobile-menu-btn {
             display: none;
             background: #1e293b;
@@ -65,22 +47,17 @@
             cursor: pointer;
         }
 
+        /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .mobile-menu-btn { display: block; }
             
-            /* Hide sidebar by default on mobile */
             .sidebar { 
                 transform: translateX(-100%); 
                 transition: 0.3s;
                 width: 250px; 
             }
+            .sidebar.show { transform: translateX(0); }
             
-            /* Show sidebar when toggled */
-            .sidebar.show { 
-                transform: translateX(0); 
-            }
-            
-            /* Add overlay when sidebar is open */
             .sidebar-overlay {
                 display: none;
                 position: fixed;
@@ -89,13 +66,23 @@
                 z-index: 999;
             }
             .sidebar-overlay.show { display: block; }
+            
+            .main-content { margin-left: 0; padding: 10px; }
+            .top-navbar { flex-direction: column; align-items: flex-start; gap: 10px; padding: 15px; }
+            .top-navbar .d-flex { flex-wrap: wrap; width: 100%; }
+            .top-navbar .input-group { width: 100% !important; margin-bottom: 10px; }
+            .card-body { padding: 15px; }
+            
+            .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            table { font-size: 13px; white-space: nowrap; }
         }
     </style>
 </head>
 <body>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
     <!-- SIDEBAR -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <h3><i class="fas fa-university"></i> Chuka SRMS</h3>
         <a id="nav-dashboard" onclick="showPage('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</a>
         <a id="nav-students" class="active" onclick="showPage('students')"><i class="fas fa-user-graduate"></i> Students</a>
@@ -109,7 +96,7 @@
 
     <!-- MAIN CONTENT -->
     <div class="main-content">
-         <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
         <div class="top-navbar">
             <h4 id="pageTitle" class="mb-0 fw-bold text-dark">Student Management</h4>
             <div class="d-flex align-items-center gap-3">
@@ -346,4 +333,2349 @@
 
     <script src="app.js"></script>
 </body>
-</html>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuka University SRMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; overflow-x: hidden; }
+        
+        /* Desktop Sidebar */
+        .sidebar { height: 100vh; width: 260px; position: fixed; top: 0; left: 0; background-color: #1e293b; color: white; padding-top: 20px; z-index: 1000; overflow-y: auto; }
+        .sidebar h3 { text-align: center; font-weight: 700; margin-bottom: 30px; color: #38bdf8; font-size: 22px; }
+        .sidebar a { padding: 15px 25px; text-decoration: none; font-size: 16px; color: #cbd5e1; display: block; cursor: pointer; border-left: 4px solid transparent; }
+        .sidebar a:hover, .sidebar a.active { background-color: #0f172a; color: white; border-left: 4px solid #38bdf8; }
+        .sidebar a i { margin-right: 15px; width: 20px; text-align: center; }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; padding: 20px 40px; }
+        .top-navbar { background: white; padding: 15px 30px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Cards & Tables */
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; }
+        .card-header { background: white; font-weight: 600; color: #334155; padding: 15px 20px; border-bottom: 1px solid #f1f5f9; border-radius: 12px 12px 0 0 !important; }
+        .card-body { padding: 20px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .form-control, .form-select { border-radius: 8px; padding: 10px 15px; }
+        .table th { font-weight: 600; color: #64748b; }
+        
+        /* Chart Container */
+        .chart-container { position: relative; height: 300px; width: 100%; }
+
+        /* Mobile Hamburger Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: #1e293b;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .mobile-menu-btn { display: block; }
+            
+            .sidebar { 
+                transform: translateX(-100%); 
+                transition: 0.3s;
+                width: 250px; 
+            }
+            .sidebar.show { transform: translateX(0); }
+            
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            }
+            .sidebar-overlay.show { display: block; }
+            
+            .main-content { margin-left: 0; padding: 10px; }
+            .top-navbar { flex-direction: column; align-items: flex-start; gap: 10px; padding: 15px; }
+            .top-navbar .d-flex { flex-wrap: wrap; width: 100%; }
+            .top-navbar .input-group { width: 100% !important; margin-bottom: 10px; }
+            .card-body { padding: 15px; }
+            
+            .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            table { font-size: 13px; white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <h3><i class="fas fa-university"></i> Chuka SRMS</h3>
+        <a id="nav-dashboard" onclick="showPage('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</a>
+        <a id="nav-students" class="active" onclick="showPage('students')"><i class="fas fa-user-graduate"></i> Students</a>
+        <a id="nav-courses" onclick="showPage('courses')"><i class="fas fa-book"></i> Courses</a>
+        <a id="nav-tutors" onclick="showPage('tutors')"><i class="fas fa-chalkboard-teacher"></i> Tutors</a>
+        <a id="nav-enrollments" onclick="showPage('enrollments')"><i class="fas fa-clipboard-list"></i> Enrollments</a>
+        <a id="nav-results" onclick="showPage('results')"><i class="fas fa-file-alt"></i> Examination Results</a>
+        <a id="nav-allocations" onclick="showPage('allocations')"><i class="fas fa-tasks"></i> Course Allocation</a>
+        <a id="nav-reports" onclick="showPage('reports')"><i class="fas fa-chart-line"></i> Reports</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div class="top-navbar">
+            <h4 id="pageTitle" class="mb-0 fw-bold text-dark">Student Management</h4>
+            <div class="d-flex align-items-center gap-3">
+                <div class="input-group" id="searchContainer" style="width: 300px;">
+                    <input type="text" id="globalSearch" class="form-control" placeholder="Search students..." onkeyup="handleSearch(event)">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                </div>
+                <span class="text-muted"><i class="fas fa-user-circle fa-lg"></i> Admin</span>
+                <form action="/logout" method="post" class="mb-0"><button type="submit" class="btn btn-outline-danger btn-sm">Logout</button></form>
+            </div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="page-dashboard" class="page">
+            <div class="row">
+                <div class="col-md-6"><div class="card"><div class="card-header">Students by Major</div><div class="card-body"><div class="chart-container"><canvas id="majorChart"></canvas></div></div></div></div>
+                <div class="col-md-6"><div class="card"><div class="card-header">Enrollments by Semester</div><div class="card-body"><div class="chart-container"><canvas id="semesterChart"></canvas></div></div></div></div>
+            </div>
+        </div>
+
+        <!-- STUDENTS -->
+        <div id="page-students" class="page active">
+            <div class="card">
+                <div class="card-header">Add / Edit Student</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="studentId" class="form-control" placeholder="Student ID">
+                        <button id="generateStudentBtn" class="btn btn-secondary text-nowrap" onclick="generateStudentId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="firstName" class="form-control" placeholder="First Name">
+                        <input type="text" id="lastName" class="form-control" placeholder="Last Name">
+                        <input type="text" id="major" class="form-control" placeholder="Major">
+                        <button id="addStudentBtn" class="btn btn-success text-nowrap" onclick="addStudent()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateStudentBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateStudent()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelStudentBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadStudents()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    Stored Students
+                    <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='https://srms-web-pci5.onrender.com/api/students/export'"><i class="fas fa-file-excel"></i> Export to CSV</button>
+                </div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Major</th><th>Actions</th></tr></thead><tbody id="studentTable"></tbody></table>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center bg-white">
+                    <button class="btn btn-outline-secondary btn-sm" id="prevBtn" onclick="changePage(-1)">Previous</button>
+                    <span id="pageInfo" class="text-muted fw-bold">Page 1</span>
+                    <button class="btn btn-outline-secondary btn-sm" id="nextBtn" onclick="changePage(1)">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COURSES -->
+        <div id="page-courses" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Course</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="courseId" class="form-control" placeholder="Course ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateCourseId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="courseName" class="form-control" placeholder="Course Name">
+                        <input type="number" id="credits" class="form-control" placeholder="Credits">
+                        <input type="text" id="department" class="form-control" placeholder="Department">
+                        <button id="addCourseBtn" class="btn btn-success text-nowrap" onclick="addCourse()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateCourseBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateCourse()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelCourseBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadCourses()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Courses</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Course ID</th><th>Course Name</th><th>Credits</th><th>Department</th><th>Actions</th></tr></thead><tbody id="courseTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TUTORS -->
+        <div id="page-tutors" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Tutor</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="tutorId" class="form-control" placeholder="Tutor ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateTutorId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="tutorFirstName" class="form-control" placeholder="First Name">
+                        <input type="text" id="tutorLastName" class="form-control" placeholder="Last Name">
+                        <input type="text" id="tutorDepartment" class="form-control" placeholder="Department">
+                        <button id="addTutorBtn" class="btn btn-success text-nowrap" onclick="addTutor()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateTutorBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateTutor()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelTutorBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadTutors()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Tutors</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Tutor ID</th><th>First Name</th><th>Last Name</th><th>Department</th><th>Actions</th></tr></thead><tbody id="tutorTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ENROLLMENTS -->
+        <div id="page-enrollments" class="page">
+            <div class="card border-success mb-4">
+                <div class="card-header text-success d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-bolt"></i> Bulk Enroll Students (Fast Way)</span>
+                    <span class="badge bg-success" id="selectedCount">0 Selected</span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3 g-2">
+                        <div class="col-md-4">
+                            <label class="form-label text-muted fw-bold">Select Course</label>
+                            <select id="bulkCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-muted fw-bold">Semester</label>
+                            <input type="number" id="bulkSemester" class="form-control" placeholder="e.g. 1" min="1" max="2">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-muted fw-bold">Year</label>
+                            <input type="number" id="bulkYear" class="form-control" placeholder="e.g. 2024">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-success w-100" onclick="bulkEnroll()"><i class="fas fa-check-double"></i> Enroll</button>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-2 gap-2">
+                        <label class="form-label text-muted fw-bold mb-0">Select Students:</label>
+                        <input type="text" id="bulkSearch" class="form-control" style="max-width: 300px;" placeholder="Search student by name..." onkeyup="filterBulkStudents()">
+                    </div>
+                    <div class="student-checkbox-list" id="studentCheckboxList"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Manual Enroll (Single Student)</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="enrollmentId" class="form-control" placeholder="Enrollment ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateEnrollmentId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="enrollStudentId" class="form-select"><option value="">-- Select Student --</option></select>
+                        <select id="enrollCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        <input type="number" id="semester" class="form-control" placeholder="Semester">
+                        <input type="number" id="year" class="form-control" placeholder="Year">
+                        <button id="addEnrollmentBtn" class="btn btn-success text-nowrap" onclick="addEnrollment()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateEnrollmentBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateEnrollment()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelEnrollmentBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadEnrollments()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    Stored Enrollments
+                    <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='https://srms-web-pci5.onrender.com/api/enrollments/export'"><i class="fas fa-file-excel"></i> Export to CSV</button>
+                </div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Enrollment ID</th><th>Student ID</th><th>Course ID</th><th>Sem</th><th>Year</th><th>Date</th><th>Actions</th></tr></thead><tbody id="enrollmentTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div id="page-results" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Examination Result</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="resultId" class="form-control" placeholder="Result ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateResultId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="resultEnrollmentId" class="form-select"><option value="">-- Select Enrollment --</option></select>
+                        <input type="number" id="score" class="form-control" placeholder="Score (0-100)" oninput="calculateGrade()">
+                        <input type="text" id="grade" class="form-control" placeholder="Grade" readonly>
+                        <input type="number" id="resultSemester" class="form-control" placeholder="Semester">
+                        <input type="number" id="resultYear" class="form-control" placeholder="Year">
+                        <button id="addResultBtn" class="btn btn-success text-nowrap" onclick="addResult()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateResultBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateResult()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelResultBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadResults()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Results</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Result ID</th><th>Enrollment ID</th><th>Score</th><th>Grade</th><th>Sem</th><th>Year</th><th>Actions</th></tr></thead><tbody id="resultTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALLOCATIONS -->
+        <div id="page-allocations" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Course Allocation</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="allocationId" class="form-control" placeholder="Allocation ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateAllocationId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="allocCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        <select id="allocTutorId" class="form-select"><option value="">-- Select Tutor --</option></select>
+                        <input type="number" id="allocSemester" class="form-control" placeholder="Semester">
+                        <input type="number" id="allocYear" class="form-control" placeholder="Year">
+                        <button id="addAllocBtn" class="btn btn-success text-nowrap" onclick="addAllocation()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateAllocBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateAllocation()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelAllocBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadAllocations()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Course Allocations</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Allocation ID</th><th>Course</th><th>Tutor</th><th>Semester</th><th>Year</th><th>Actions</th></tr></thead><tbody id="allocationTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- REPORTS -->
+        <div id="page-reports" class="page">
+            <div class="card">
+                <div class="card-header">Student Academic Transcript</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center mb-3">
+                        <select id="reportStudentSelect" class="form-select"><option value="">-- Select a Student --</option></select>
+                        <button class="btn btn-primary text-nowrap" onclick="generateTranscript()">Generate Report</button>
+                        <button class="btn btn-danger text-nowrap" onclick="downloadPdf()">Download PDF</button>
+                    </div>
+                    <div id="transcriptOutput" class="table-responsive"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuka University SRMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; overflow-x: hidden; }
+        
+        /* Desktop Sidebar */
+        .sidebar { height: 100vh; width: 260px; position: fixed; top: 0; left: 0; background-color: #1e293b; color: white; padding-top: 20px; z-index: 1000; overflow-y: auto; }
+        .sidebar h3 { text-align: center; font-weight: 700; margin-bottom: 30px; color: #38bdf8; font-size: 22px; }
+        .sidebar a { padding: 15px 25px; text-decoration: none; font-size: 16px; color: #cbd5e1; display: block; cursor: pointer; border-left: 4px solid transparent; }
+        .sidebar a:hover, .sidebar a.active { background-color: #0f172a; color: white; border-left: 4px solid #38bdf8; }
+        .sidebar a i { margin-right: 15px; width: 20px; text-align: center; }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; padding: 20px 40px; }
+        .top-navbar { background: white; padding: 15px 30px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Cards & Tables */
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; }
+        .card-header { background: white; font-weight: 600; color: #334155; padding: 15px 20px; border-bottom: 1px solid #f1f5f9; border-radius: 12px 12px 0 0 !important; }
+        .card-body { padding: 20px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .form-control, .form-select { border-radius: 8px; padding: 10px 15px; }
+        .table th { font-weight: 600; color: #64748b; }
+        
+        /* Chart Container */
+        .chart-container { position: relative; height: 300px; width: 100%; }
+
+        /* Mobile Hamburger Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: #1e293b;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .mobile-menu-btn { display: block; }
+            
+            .sidebar { 
+                transform: translateX(-100%); 
+                transition: 0.3s;
+                width: 250px; 
+            }
+            .sidebar.show { transform: translateX(0); }
+            
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            }
+            .sidebar-overlay.show { display: block; }
+            
+            .main-content { margin-left: 0; padding: 10px; }
+            .top-navbar { flex-direction: column; align-items: flex-start; gap: 10px; padding: 15px; }
+            .top-navbar .d-flex { flex-wrap: wrap; width: 100%; }
+            .top-navbar .input-group { width: 100% !important; margin-bottom: 10px; }
+            .card-body { padding: 15px; }
+            
+            .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            table { font-size: 13px; white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <h3><i class="fas fa-university"></i> Chuka SRMS</h3>
+        <a id="nav-dashboard" onclick="showPage('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</a>
+        <a id="nav-students" class="active" onclick="showPage('students')"><i class="fas fa-user-graduate"></i> Students</a>
+        <a id="nav-courses" onclick="showPage('courses')"><i class="fas fa-book"></i> Courses</a>
+        <a id="nav-tutors" onclick="showPage('tutors')"><i class="fas fa-chalkboard-teacher"></i> Tutors</a>
+        <a id="nav-enrollments" onclick="showPage('enrollments')"><i class="fas fa-clipboard-list"></i> Enrollments</a>
+        <a id="nav-results" onclick="showPage('results')"><i class="fas fa-file-alt"></i> Examination Results</a>
+        <a id="nav-allocations" onclick="showPage('allocations')"><i class="fas fa-tasks"></i> Course Allocation</a>
+        <a id="nav-reports" onclick="showPage('reports')"><i class="fas fa-chart-line"></i> Reports</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div class="top-navbar">
+            <h4 id="pageTitle" class="mb-0 fw-bold text-dark">Student Management</h4>
+            <div class="d-flex align-items-center gap-3">
+                <div class="input-group" id="searchContainer" style="width: 300px;">
+                    <input type="text" id="globalSearch" class="form-control" placeholder="Search students..." onkeyup="handleSearch(event)">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                </div>
+                <span class="text-muted"><i class="fas fa-user-circle fa-lg"></i> Admin</span>
+                <form action="/logout" method="post" class="mb-0"><button type="submit" class="btn btn-outline-danger btn-sm">Logout</button></form>
+            </div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="page-dashboard" class="page">
+            <div class="row">
+                <div class="col-md-6"><div class="card"><div class="card-header">Students by Major</div><div class="card-body"><div class="chart-container"><canvas id="majorChart"></canvas></div></div></div></div>
+                <div class="col-md-6"><div class="card"><div class="card-header">Enrollments by Semester</div><div class="card-body"><div class="chart-container"><canvas id="semesterChart"></canvas></div></div></div></div>
+            </div>
+        </div>
+
+        <!-- STUDENTS -->
+        <div id="page-students" class="page active">
+            <div class="card">
+                <div class="card-header">Add / Edit Student</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="studentId" class="form-control" placeholder="Student ID">
+                        <button id="generateStudentBtn" class="btn btn-secondary text-nowrap" onclick="generateStudentId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="firstName" class="form-control" placeholder="First Name">
+                        <input type="text" id="lastName" class="form-control" placeholder="Last Name">
+                        <input type="text" id="major" class="form-control" placeholder="Major">
+                        <button id="addStudentBtn" class="btn btn-success text-nowrap" onclick="addStudent()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateStudentBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateStudent()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelStudentBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadStudents()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    Stored Students
+                    <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='https://srms-web-pci5.onrender.com/api/students/export'"><i class="fas fa-file-excel"></i> Export to CSV</button>
+                </div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Major</th><th>Actions</th></tr></thead><tbody id="studentTable"></tbody></table>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center bg-white">
+                    <button class="btn btn-outline-secondary btn-sm" id="prevBtn" onclick="changePage(-1)">Previous</button>
+                    <span id="pageInfo" class="text-muted fw-bold">Page 1</span>
+                    <button class="btn btn-outline-secondary btn-sm" id="nextBtn" onclick="changePage(1)">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COURSES -->
+        <div id="page-courses" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Course</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="courseId" class="form-control" placeholder="Course ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateCourseId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="courseName" class="form-control" placeholder="Course Name">
+                        <input type="number" id="credits" class="form-control" placeholder="Credits">
+                        <input type="text" id="department" class="form-control" placeholder="Department">
+                        <button id="addCourseBtn" class="btn btn-success text-nowrap" onclick="addCourse()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateCourseBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateCourse()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelCourseBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadCourses()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Courses</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Course ID</th><th>Course Name</th><th>Credits</th><th>Department</th><th>Actions</th></tr></thead><tbody id="courseTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TUTORS -->
+        <div id="page-tutors" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Tutor</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="tutorId" class="form-control" placeholder="Tutor ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateTutorId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="tutorFirstName" class="form-control" placeholder="First Name">
+                        <input type="text" id="tutorLastName" class="form-control" placeholder="Last Name">
+                        <input type="text" id="tutorDepartment" class="form-control" placeholder="Department">
+                        <button id="addTutorBtn" class="btn btn-success text-nowrap" onclick="addTutor()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateTutorBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateTutor()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelTutorBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadTutors()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Tutors</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Tutor ID</th><th>First Name</th><th>Last Name</th><th>Department</th><th>Actions</th></tr></thead><tbody id="tutorTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ENROLLMENTS -->
+        <div id="page-enrollments" class="page">
+            <div class="card border-success mb-4">
+                <div class="card-header text-success d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-bolt"></i> Bulk Enroll Students (Fast Way)</span>
+                    <span class="badge bg-success" id="selectedCount">0 Selected</span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3 g-2">
+                        <div class="col-md-4">
+                            <label class="form-label text-muted fw-bold">Select Course</label>
+                            <select id="bulkCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-muted fw-bold">Semester</label>
+                            <input type="number" id="bulkSemester" class="form-control" placeholder="e.g. 1" min="1" max="2">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-muted fw-bold">Year</label>
+                            <input type="number" id="bulkYear" class="form-control" placeholder="e.g. 2024">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-success w-100" onclick="bulkEnroll()"><i class="fas fa-check-double"></i> Enroll</button>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-2 gap-2">
+                        <label class="form-label text-muted fw-bold mb-0">Select Students:</label>
+                        <input type="text" id="bulkSearch" class="form-control" style="max-width: 300px;" placeholder="Search student by name..." onkeyup="filterBulkStudents()">
+                    </div>
+                    <div class="student-checkbox-list" id="studentCheckboxList"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Manual Enroll (Single Student)</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="enrollmentId" class="form-control" placeholder="Enrollment ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateEnrollmentId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="enrollStudentId" class="form-select"><option value="">-- Select Student --</option></select>
+                        <select id="enrollCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        <input type="number" id="semester" class="form-control" placeholder="Semester">
+                        <input type="number" id="year" class="form-control" placeholder="Year">
+                        <button id="addEnrollmentBtn" class="btn btn-success text-nowrap" onclick="addEnrollment()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateEnrollmentBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateEnrollment()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelEnrollmentBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadEnrollments()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    Stored Enrollments
+                    <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='https://srms-web-pci5.onrender.com/api/enrollments/export'"><i class="fas fa-file-excel"></i> Export to CSV</button>
+                </div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Enrollment ID</th><th>Student ID</th><th>Course ID</th><th>Sem</th><th>Year</th><th>Date</th><th>Actions</th></tr></thead><tbody id="enrollmentTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div id="page-results" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Examination Result</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="resultId" class="form-control" placeholder="Result ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateResultId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="resultEnrollmentId" class="form-select"><option value="">-- Select Enrollment --</option></select>
+                        <input type="number" id="score" class="form-control" placeholder="Score (0-100)" oninput="calculateGrade()">
+                        <input type="text" id="grade" class="form-control" placeholder="Grade" readonly>
+                        <input type="number" id="resultSemester" class="form-control" placeholder="Semester">
+                        <input type="number" id="resultYear" class="form-control" placeholder="Year">
+                        <button id="addResultBtn" class="btn btn-success text-nowrap" onclick="addResult()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateResultBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateResult()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelResultBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadResults()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Results</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Result ID</th><th>Enrollment ID</th><th>Score</th><th>Grade</th><th>Sem</th><th>Year</th><th>Actions</th></tr></thead><tbody id="resultTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALLOCATIONS -->
+        <div id="page-allocations" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Course Allocation</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="allocationId" class="form-control" placeholder="Allocation ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateAllocationId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="allocCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        <select id="allocTutorId" class="form-select"><option value="">-- Select Tutor --</option></select>
+                        <input type="number" id="allocSemester" class="form-control" placeholder="Semester">
+                        <input type="number" id="allocYear" class="form-control" placeholder="Year">
+                        <button id="addAllocBtn" class="btn btn-success text-nowrap" onclick="addAllocation()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateAllocBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateAllocation()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelAllocBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadAllocations()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Course Allocations</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Allocation ID</th><th>Course</th><th>Tutor</th><th>Semester</th><th>Year</th><th>Actions</th></tr></thead><tbody id="allocationTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- REPORTS -->
+        <div id="page-reports" class="page">
+            <div class="card">
+                <div class="card-header">Student Academic Transcript</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center mb-3">
+                        <select id="reportStudentSelect" class="form-select"><option value="">-- Select a Student --</option></select>
+                        <button class="btn btn-primary text-nowrap" onclick="generateTranscript()">Generate Report</button>
+                        <button class="btn btn-danger text-nowrap" onclick="downloadPdf()">Download PDF</button>
+                    </div>
+                    <div id="transcriptOutput" class="table-responsive"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuka University SRMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; overflow-x: hidden; }
+        
+        /* Desktop Sidebar */
+        .sidebar { height: 100vh; width: 260px; position: fixed; top: 0; left: 0; background-color: #1e293b; color: white; padding-top: 20px; z-index: 1000; overflow-y: auto; }
+        .sidebar h3 { text-align: center; font-weight: 700; margin-bottom: 30px; color: #38bdf8; font-size: 22px; }
+        .sidebar a { padding: 15px 25px; text-decoration: none; font-size: 16px; color: #cbd5e1; display: block; cursor: pointer; border-left: 4px solid transparent; }
+        .sidebar a:hover, .sidebar a.active { background-color: #0f172a; color: white; border-left: 4px solid #38bdf8; }
+        .sidebar a i { margin-right: 15px; width: 20px; text-align: center; }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; padding: 20px 40px; }
+        .top-navbar { background: white; padding: 15px 30px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Cards & Tables */
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; }
+        .card-header { background: white; font-weight: 600; color: #334155; padding: 15px 20px; border-bottom: 1px solid #f1f5f9; border-radius: 12px 12px 0 0 !important; }
+        .card-body { padding: 20px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .form-control, .form-select { border-radius: 8px; padding: 10px 15px; }
+        .table th { font-weight: 600; color: #64748b; }
+        
+        /* Chart Container */
+        .chart-container { position: relative; height: 300px; width: 100%; }
+
+        /* Mobile Hamburger Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: #1e293b;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .mobile-menu-btn { display: block; }
+            
+            .sidebar { 
+                transform: translateX(-100%); 
+                transition: 0.3s;
+                width: 250px; 
+            }
+            .sidebar.show { transform: translateX(0); }
+            
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            }
+            .sidebar-overlay.show { display: block; }
+            
+            .main-content { margin-left: 0; padding: 10px; }
+            .top-navbar { flex-direction: column; align-items: flex-start; gap: 10px; padding: 15px; }
+            .top-navbar .d-flex { flex-wrap: wrap; width: 100%; }
+            .top-navbar .input-group { width: 100% !important; margin-bottom: 10px; }
+            .card-body { padding: 15px; }
+            
+            .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            table { font-size: 13px; white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <h3><i class="fas fa-university"></i> Chuka SRMS</h3>
+        <a id="nav-dashboard" onclick="showPage('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</a>
+        <a id="nav-students" class="active" onclick="showPage('students')"><i class="fas fa-user-graduate"></i> Students</a>
+        <a id="nav-courses" onclick="showPage('courses')"><i class="fas fa-book"></i> Courses</a>
+        <a id="nav-tutors" onclick="showPage('tutors')"><i class="fas fa-chalkboard-teacher"></i> Tutors</a>
+        <a id="nav-enrollments" onclick="showPage('enrollments')"><i class="fas fa-clipboard-list"></i> Enrollments</a>
+        <a id="nav-results" onclick="showPage('results')"><i class="fas fa-file-alt"></i> Examination Results</a>
+        <a id="nav-allocations" onclick="showPage('allocations')"><i class="fas fa-tasks"></i> Course Allocation</a>
+        <a id="nav-reports" onclick="showPage('reports')"><i class="fas fa-chart-line"></i> Reports</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div class="top-navbar">
+            <h4 id="pageTitle" class="mb-0 fw-bold text-dark">Student Management</h4>
+            <div class="d-flex align-items-center gap-3">
+                <div class="input-group" id="searchContainer" style="width: 300px;">
+                    <input type="text" id="globalSearch" class="form-control" placeholder="Search students..." onkeyup="handleSearch(event)">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                </div>
+                <span class="text-muted"><i class="fas fa-user-circle fa-lg"></i> Admin</span>
+                <form action="/logout" method="post" class="mb-0"><button type="submit" class="btn btn-outline-danger btn-sm">Logout</button></form>
+            </div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="page-dashboard" class="page">
+            <div class="row">
+                <div class="col-md-6"><div class="card"><div class="card-header">Students by Major</div><div class="card-body"><div class="chart-container"><canvas id="majorChart"></canvas></div></div></div></div>
+                <div class="col-md-6"><div class="card"><div class="card-header">Enrollments by Semester</div><div class="card-body"><div class="chart-container"><canvas id="semesterChart"></canvas></div></div></div></div>
+            </div>
+        </div>
+
+        <!-- STUDENTS -->
+        <div id="page-students" class="page active">
+            <div class="card">
+                <div class="card-header">Add / Edit Student</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="studentId" class="form-control" placeholder="Student ID">
+                        <button id="generateStudentBtn" class="btn btn-secondary text-nowrap" onclick="generateStudentId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="firstName" class="form-control" placeholder="First Name">
+                        <input type="text" id="lastName" class="form-control" placeholder="Last Name">
+                        <input type="text" id="major" class="form-control" placeholder="Major">
+                        <button id="addStudentBtn" class="btn btn-success text-nowrap" onclick="addStudent()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateStudentBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateStudent()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelStudentBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadStudents()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    Stored Students
+                    <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='https://srms-web-pci5.onrender.com/api/students/export'"><i class="fas fa-file-excel"></i> Export to CSV</button>
+                </div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Major</th><th>Actions</th></tr></thead><tbody id="studentTable"></tbody></table>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center bg-white">
+                    <button class="btn btn-outline-secondary btn-sm" id="prevBtn" onclick="changePage(-1)">Previous</button>
+                    <span id="pageInfo" class="text-muted fw-bold">Page 1</span>
+                    <button class="btn btn-outline-secondary btn-sm" id="nextBtn" onclick="changePage(1)">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COURSES -->
+        <div id="page-courses" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Course</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="courseId" class="form-control" placeholder="Course ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateCourseId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="courseName" class="form-control" placeholder="Course Name">
+                        <input type="number" id="credits" class="form-control" placeholder="Credits">
+                        <input type="text" id="department" class="form-control" placeholder="Department">
+                        <button id="addCourseBtn" class="btn btn-success text-nowrap" onclick="addCourse()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateCourseBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateCourse()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelCourseBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadCourses()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Courses</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Course ID</th><th>Course Name</th><th>Credits</th><th>Department</th><th>Actions</th></tr></thead><tbody id="courseTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TUTORS -->
+        <div id="page-tutors" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Tutor</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="tutorId" class="form-control" placeholder="Tutor ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateTutorId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="tutorFirstName" class="form-control" placeholder="First Name">
+                        <input type="text" id="tutorLastName" class="form-control" placeholder="Last Name">
+                        <input type="text" id="tutorDepartment" class="form-control" placeholder="Department">
+                        <button id="addTutorBtn" class="btn btn-success text-nowrap" onclick="addTutor()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateTutorBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateTutor()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelTutorBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadTutors()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Tutors</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Tutor ID</th><th>First Name</th><th>Last Name</th><th>Department</th><th>Actions</th></tr></thead><tbody id="tutorTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ENROLLMENTS -->
+        <div id="page-enrollments" class="page">
+            <div class="card border-success mb-4">
+                <div class="card-header text-success d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-bolt"></i> Bulk Enroll Students (Fast Way)</span>
+                    <span class="badge bg-success" id="selectedCount">0 Selected</span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3 g-2">
+                        <div class="col-md-4">
+                            <label class="form-label text-muted fw-bold">Select Course</label>
+                            <select id="bulkCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-muted fw-bold">Semester</label>
+                            <input type="number" id="bulkSemester" class="form-control" placeholder="e.g. 1" min="1" max="2">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-muted fw-bold">Year</label>
+                            <input type="number" id="bulkYear" class="form-control" placeholder="e.g. 2024">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-success w-100" onclick="bulkEnroll()"><i class="fas fa-check-double"></i> Enroll</button>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-2 gap-2">
+                        <label class="form-label text-muted fw-bold mb-0">Select Students:</label>
+                        <input type="text" id="bulkSearch" class="form-control" style="max-width: 300px;" placeholder="Search student by name..." onkeyup="filterBulkStudents()">
+                    </div>
+                    <div class="student-checkbox-list" id="studentCheckboxList"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Manual Enroll (Single Student)</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="enrollmentId" class="form-control" placeholder="Enrollment ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateEnrollmentId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="enrollStudentId" class="form-select"><option value="">-- Select Student --</option></select>
+                        <select id="enrollCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        <input type="number" id="semester" class="form-control" placeholder="Semester">
+                        <input type="number" id="year" class="form-control" placeholder="Year">
+                        <button id="addEnrollmentBtn" class="btn btn-success text-nowrap" onclick="addEnrollment()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateEnrollmentBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateEnrollment()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelEnrollmentBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadEnrollments()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    Stored Enrollments
+                    <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='https://srms-web-pci5.onrender.com/api/enrollments/export'"><i class="fas fa-file-excel"></i> Export to CSV</button>
+                </div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Enrollment ID</th><th>Student ID</th><th>Course ID</th><th>Sem</th><th>Year</th><th>Date</th><th>Actions</th></tr></thead><tbody id="enrollmentTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div id="page-results" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Examination Result</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="resultId" class="form-control" placeholder="Result ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateResultId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="resultEnrollmentId" class="form-select"><option value="">-- Select Enrollment --</option></select>
+                        <input type="number" id="score" class="form-control" placeholder="Score (0-100)" oninput="calculateGrade()">
+                        <input type="text" id="grade" class="form-control" placeholder="Grade" readonly>
+                        <input type="number" id="resultSemester" class="form-control" placeholder="Semester">
+                        <input type="number" id="resultYear" class="form-control" placeholder="Year">
+                        <button id="addResultBtn" class="btn btn-success text-nowrap" onclick="addResult()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateResultBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateResult()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelResultBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadResults()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Results</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Result ID</th><th>Enrollment ID</th><th>Score</th><th>Grade</th><th>Sem</th><th>Year</th><th>Actions</th></tr></thead><tbody id="resultTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALLOCATIONS -->
+        <div id="page-allocations" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Course Allocation</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="allocationId" class="form-control" placeholder="Allocation ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateAllocationId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="allocCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        <select id="allocTutorId" class="form-select"><option value="">-- Select Tutor --</option></select>
+                        <input type="number" id="allocSemester" class="form-control" placeholder="Semester">
+                        <input type="number" id="allocYear" class="form-control" placeholder="Year">
+                        <button id="addAllocBtn" class="btn btn-success text-nowrap" onclick="addAllocation()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateAllocBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateAllocation()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelAllocBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadAllocations()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Course Allocations</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Allocation ID</th><th>Course</th><th>Tutor</th><th>Semester</th><th>Year</th><th>Actions</th></tr></thead><tbody id="allocationTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- REPORTS -->
+        <div id="page-reports" class="page">
+            <div class="card">
+                <div class="card-header">Student Academic Transcript</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center mb-3">
+                        <select id="reportStudentSelect" class="form-select"><option value="">-- Select a Student --</option></select>
+                        <button class="btn btn-primary text-nowrap" onclick="generateTranscript()">Generate Report</button>
+                        <button class="btn btn-danger text-nowrap" onclick="downloadPdf()">Download PDF</button>
+                    </div>
+                    <div id="transcriptOutput" class="table-responsive"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuka University SRMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; overflow-x: hidden; }
+        
+        /* Desktop Sidebar */
+        .sidebar { height: 100vh; width: 260px; position: fixed; top: 0; left: 0; background-color: #1e293b; color: white; padding-top: 20px; z-index: 1000; overflow-y: auto; }
+        .sidebar h3 { text-align: center; font-weight: 700; margin-bottom: 30px; color: #38bdf8; font-size: 22px; }
+        .sidebar a { padding: 15px 25px; text-decoration: none; font-size: 16px; color: #cbd5e1; display: block; cursor: pointer; border-left: 4px solid transparent; }
+        .sidebar a:hover, .sidebar a.active { background-color: #0f172a; color: white; border-left: 4px solid #38bdf8; }
+        .sidebar a i { margin-right: 15px; width: 20px; text-align: center; }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; padding: 20px 40px; }
+        .top-navbar { background: white; padding: 15px 30px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Cards & Tables */
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; }
+        .card-header { background: white; font-weight: 600; color: #334155; padding: 15px 20px; border-bottom: 1px solid #f1f5f9; border-radius: 12px 12px 0 0 !important; }
+        .card-body { padding: 20px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .form-control, .form-select { border-radius: 8px; padding: 10px 15px; }
+        .table th { font-weight: 600; color: #64748b; }
+        
+        /* Chart Container */
+        .chart-container { position: relative; height: 300px; width: 100%; }
+
+        /* Mobile Hamburger Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: #1e293b;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .mobile-menu-btn { display: block; }
+            
+            .sidebar { 
+                transform: translateX(-100%); 
+                transition: 0.3s;
+                width: 250px; 
+            }
+            .sidebar.show { transform: translateX(0); }
+            
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            }
+            .sidebar-overlay.show { display: block; }
+            
+            .main-content { margin-left: 0; padding: 10px; }
+            .top-navbar { flex-direction: column; align-items: flex-start; gap: 10px; padding: 15px; }
+            .top-navbar .d-flex { flex-wrap: wrap; width: 100%; }
+            .top-navbar .input-group { width: 100% !important; margin-bottom: 10px; }
+            .card-body { padding: 15px; }
+            
+            .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            table { font-size: 13px; white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <h3><i class="fas fa-university"></i> Chuka SRMS</h3>
+        <a id="nav-dashboard" onclick="showPage('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</a>
+        <a id="nav-students" class="active" onclick="showPage('students')"><i class="fas fa-user-graduate"></i> Students</a>
+        <a id="nav-courses" onclick="showPage('courses')"><i class="fas fa-book"></i> Courses</a>
+        <a id="nav-tutors" onclick="showPage('tutors')"><i class="fas fa-chalkboard-teacher"></i> Tutors</a>
+        <a id="nav-enrollments" onclick="showPage('enrollments')"><i class="fas fa-clipboard-list"></i> Enrollments</a>
+        <a id="nav-results" onclick="showPage('results')"><i class="fas fa-file-alt"></i> Examination Results</a>
+        <a id="nav-allocations" onclick="showPage('allocations')"><i class="fas fa-tasks"></i> Course Allocation</a>
+        <a id="nav-reports" onclick="showPage('reports')"><i class="fas fa-chart-line"></i> Reports</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div class="top-navbar">
+            <h4 id="pageTitle" class="mb-0 fw-bold text-dark">Student Management</h4>
+            <div class="d-flex align-items-center gap-3">
+                <div class="input-group" id="searchContainer" style="width: 300px;">
+                    <input type="text" id="globalSearch" class="form-control" placeholder="Search students..." onkeyup="handleSearch(event)">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                </div>
+                <span class="text-muted"><i class="fas fa-user-circle fa-lg"></i> Admin</span>
+                <form action="/logout" method="post" class="mb-0"><button type="submit" class="btn btn-outline-danger btn-sm">Logout</button></form>
+            </div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="page-dashboard" class="page">
+            <div class="row">
+                <div class="col-md-6"><div class="card"><div class="card-header">Students by Major</div><div class="card-body"><div class="chart-container"><canvas id="majorChart"></canvas></div></div></div></div>
+                <div class="col-md-6"><div class="card"><div class="card-header">Enrollments by Semester</div><div class="card-body"><div class="chart-container"><canvas id="semesterChart"></canvas></div></div></div></div>
+            </div>
+        </div>
+
+        <!-- STUDENTS -->
+        <div id="page-students" class="page active">
+            <div class="card">
+                <div class="card-header">Add / Edit Student</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="studentId" class="form-control" placeholder="Student ID">
+                        <button id="generateStudentBtn" class="btn btn-secondary text-nowrap" onclick="generateStudentId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="firstName" class="form-control" placeholder="First Name">
+                        <input type="text" id="lastName" class="form-control" placeholder="Last Name">
+                        <input type="text" id="major" class="form-control" placeholder="Major">
+                        <button id="addStudentBtn" class="btn btn-success text-nowrap" onclick="addStudent()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateStudentBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateStudent()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelStudentBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadStudents()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    Stored Students
+                    <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='https://srms-web-pci5.onrender.com/api/students/export'"><i class="fas fa-file-excel"></i> Export to CSV</button>
+                </div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Major</th><th>Actions</th></tr></thead><tbody id="studentTable"></tbody></table>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center bg-white">
+                    <button class="btn btn-outline-secondary btn-sm" id="prevBtn" onclick="changePage(-1)">Previous</button>
+                    <span id="pageInfo" class="text-muted fw-bold">Page 1</span>
+                    <button class="btn btn-outline-secondary btn-sm" id="nextBtn" onclick="changePage(1)">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COURSES -->
+        <div id="page-courses" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Course</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="courseId" class="form-control" placeholder="Course ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateCourseId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="courseName" class="form-control" placeholder="Course Name">
+                        <input type="number" id="credits" class="form-control" placeholder="Credits">
+                        <input type="text" id="department" class="form-control" placeholder="Department">
+                        <button id="addCourseBtn" class="btn btn-success text-nowrap" onclick="addCourse()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateCourseBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateCourse()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelCourseBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadCourses()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Courses</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Course ID</th><th>Course Name</th><th>Credits</th><th>Department</th><th>Actions</th></tr></thead><tbody id="courseTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TUTORS -->
+        <div id="page-tutors" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Tutor</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="tutorId" class="form-control" placeholder="Tutor ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateTutorId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="tutorFirstName" class="form-control" placeholder="First Name">
+                        <input type="text" id="tutorLastName" class="form-control" placeholder="Last Name">
+                        <input type="text" id="tutorDepartment" class="form-control" placeholder="Department">
+                        <button id="addTutorBtn" class="btn btn-success text-nowrap" onclick="addTutor()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateTutorBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateTutor()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelTutorBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadTutors()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Tutors</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Tutor ID</th><th>First Name</th><th>Last Name</th><th>Department</th><th>Actions</th></tr></thead><tbody id="tutorTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ENROLLMENTS -->
+        <div id="page-enrollments" class="page">
+            <div class="card border-success mb-4">
+                <div class="card-header text-success d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-bolt"></i> Bulk Enroll Students (Fast Way)</span>
+                    <span class="badge bg-success" id="selectedCount">0 Selected</span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3 g-2">
+                        <div class="col-md-4">
+                            <label class="form-label text-muted fw-bold">Select Course</label>
+                            <select id="bulkCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-muted fw-bold">Semester</label>
+                            <input type="number" id="bulkSemester" class="form-control" placeholder="e.g. 1" min="1" max="2">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-muted fw-bold">Year</label>
+                            <input type="number" id="bulkYear" class="form-control" placeholder="e.g. 2024">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-success w-100" onclick="bulkEnroll()"><i class="fas fa-check-double"></i> Enroll</button>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-2 gap-2">
+                        <label class="form-label text-muted fw-bold mb-0">Select Students:</label>
+                        <input type="text" id="bulkSearch" class="form-control" style="max-width: 300px;" placeholder="Search student by name..." onkeyup="filterBulkStudents()">
+                    </div>
+                    <div class="student-checkbox-list" id="studentCheckboxList"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Manual Enroll (Single Student)</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="enrollmentId" class="form-control" placeholder="Enrollment ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateEnrollmentId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="enrollStudentId" class="form-select"><option value="">-- Select Student --</option></select>
+                        <select id="enrollCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        <input type="number" id="semester" class="form-control" placeholder="Semester">
+                        <input type="number" id="year" class="form-control" placeholder="Year">
+                        <button id="addEnrollmentBtn" class="btn btn-success text-nowrap" onclick="addEnrollment()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateEnrollmentBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateEnrollment()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelEnrollmentBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadEnrollments()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    Stored Enrollments
+                    <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='https://srms-web-pci5.onrender.com/api/enrollments/export'"><i class="fas fa-file-excel"></i> Export to CSV</button>
+                </div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Enrollment ID</th><th>Student ID</th><th>Course ID</th><th>Sem</th><th>Year</th><th>Date</th><th>Actions</th></tr></thead><tbody id="enrollmentTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div id="page-results" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Examination Result</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="resultId" class="form-control" placeholder="Result ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateResultId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="resultEnrollmentId" class="form-select"><option value="">-- Select Enrollment --</option></select>
+                        <input type="number" id="score" class="form-control" placeholder="Score (0-100)" oninput="calculateGrade()">
+                        <input type="text" id="grade" class="form-control" placeholder="Grade" readonly>
+                        <input type="number" id="resultSemester" class="form-control" placeholder="Semester">
+                        <input type="number" id="resultYear" class="form-control" placeholder="Year">
+                        <button id="addResultBtn" class="btn btn-success text-nowrap" onclick="addResult()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateResultBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateResult()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelResultBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadResults()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Results</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Result ID</th><th>Enrollment ID</th><th>Score</th><th>Grade</th><th>Sem</th><th>Year</th><th>Actions</th></tr></thead><tbody id="resultTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALLOCATIONS -->
+        <div id="page-allocations" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Course Allocation</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="allocationId" class="form-control" placeholder="Allocation ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateAllocationId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="allocCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        <select id="allocTutorId" class="form-select"><option value="">-- Select Tutor --</option></select>
+                        <input type="number" id="allocSemester" class="form-control" placeholder="Semester">
+                        <input type="number" id="allocYear" class="form-control" placeholder="Year">
+                        <button id="addAllocBtn" class="btn btn-success text-nowrap" onclick="addAllocation()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateAllocBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateAllocation()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelAllocBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadAllocations()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Course Allocations</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Allocation ID</th><th>Course</th><th>Tutor</th><th>Semester</th><th>Year</th><th>Actions</th></tr></thead><tbody id="allocationTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- REPORTS -->
+        <div id="page-reports" class="page">
+            <div class="card">
+                <div class="card-header">Student Academic Transcript</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center mb-3">
+                        <select id="reportStudentSelect" class="form-select"><option value="">-- Select a Student --</option></select>
+                        <button class="btn btn-primary text-nowrap" onclick="generateTranscript()">Generate Report</button>
+                        <button class="btn btn-danger text-nowrap" onclick="downloadPdf()">Download PDF</button>
+                    </div>
+                    <div id="transcriptOutput" class="table-responsive"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuka University SRMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; overflow-x: hidden; }
+        
+        /* Desktop Sidebar */
+        .sidebar { height: 100vh; width: 260px; position: fixed; top: 0; left: 0; background-color: #1e293b; color: white; padding-top: 20px; z-index: 1000; overflow-y: auto; }
+        .sidebar h3 { text-align: center; font-weight: 700; margin-bottom: 30px; color: #38bdf8; font-size: 22px; }
+        .sidebar a { padding: 15px 25px; text-decoration: none; font-size: 16px; color: #cbd5e1; display: block; cursor: pointer; border-left: 4px solid transparent; }
+        .sidebar a:hover, .sidebar a.active { background-color: #0f172a; color: white; border-left: 4px solid #38bdf8; }
+        .sidebar a i { margin-right: 15px; width: 20px; text-align: center; }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; padding: 20px 40px; }
+        .top-navbar { background: white; padding: 15px 30px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Cards & Tables */
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; }
+        .card-header { background: white; font-weight: 600; color: #334155; padding: 15px 20px; border-bottom: 1px solid #f1f5f9; border-radius: 12px 12px 0 0 !important; }
+        .card-body { padding: 20px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .form-control, .form-select { border-radius: 8px; padding: 10px 15px; }
+        .table th { font-weight: 600; color: #64748b; }
+        
+        /* Chart Container */
+        .chart-container { position: relative; height: 300px; width: 100%; }
+
+        /* Mobile Hamburger Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: #1e293b;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .mobile-menu-btn { display: block; }
+            
+            .sidebar { 
+                transform: translateX(-100%); 
+                transition: 0.3s;
+                width: 250px; 
+            }
+            .sidebar.show { transform: translateX(0); }
+            
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            }
+            .sidebar-overlay.show { display: block; }
+            
+            .main-content { margin-left: 0; padding: 10px; }
+            .top-navbar { flex-direction: column; align-items: flex-start; gap: 10px; padding: 15px; }
+            .top-navbar .d-flex { flex-wrap: wrap; width: 100%; }
+            .top-navbar .input-group { width: 100% !important; margin-bottom: 10px; }
+            .card-body { padding: 15px; }
+            
+            .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            table { font-size: 13px; white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <h3><i class="fas fa-university"></i> Chuka SRMS</h3>
+        <a id="nav-dashboard" onclick="showPage('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</a>
+        <a id="nav-students" class="active" onclick="showPage('students')"><i class="fas fa-user-graduate"></i> Students</a>
+        <a id="nav-courses" onclick="showPage('courses')"><i class="fas fa-book"></i> Courses</a>
+        <a id="nav-tutors" onclick="showPage('tutors')"><i class="fas fa-chalkboard-teacher"></i> Tutors</a>
+        <a id="nav-enrollments" onclick="showPage('enrollments')"><i class="fas fa-clipboard-list"></i> Enrollments</a>
+        <a id="nav-results" onclick="showPage('results')"><i class="fas fa-file-alt"></i> Examination Results</a>
+        <a id="nav-allocations" onclick="showPage('allocations')"><i class="fas fa-tasks"></i> Course Allocation</a>
+        <a id="nav-reports" onclick="showPage('reports')"><i class="fas fa-chart-line"></i> Reports</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div class="top-navbar">
+            <h4 id="pageTitle" class="mb-0 fw-bold text-dark">Student Management</h4>
+            <div class="d-flex align-items-center gap-3">
+                <div class="input-group" id="searchContainer" style="width: 300px;">
+                    <input type="text" id="globalSearch" class="form-control" placeholder="Search students..." onkeyup="handleSearch(event)">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                </div>
+                <span class="text-muted"><i class="fas fa-user-circle fa-lg"></i> Admin</span>
+                <form action="/logout" method="post" class="mb-0"><button type="submit" class="btn btn-outline-danger btn-sm">Logout</button></form>
+            </div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="page-dashboard" class="page">
+            <div class="row">
+                <div class="col-md-6"><div class="card"><div class="card-header">Students by Major</div><div class="card-body"><div class="chart-container"><canvas id="majorChart"></canvas></div></div></div></div>
+                <div class="col-md-6"><div class="card"><div class="card-header">Enrollments by Semester</div><div class="card-body"><div class="chart-container"><canvas id="semesterChart"></canvas></div></div></div></div>
+            </div>
+        </div>
+
+        <!-- STUDENTS -->
+        <div id="page-students" class="page active">
+            <div class="card">
+                <div class="card-header">Add / Edit Student</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="studentId" class="form-control" placeholder="Student ID">
+                        <button id="generateStudentBtn" class="btn btn-secondary text-nowrap" onclick="generateStudentId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="firstName" class="form-control" placeholder="First Name">
+                        <input type="text" id="lastName" class="form-control" placeholder="Last Name">
+                        <input type="text" id="major" class="form-control" placeholder="Major">
+                        <button id="addStudentBtn" class="btn btn-success text-nowrap" onclick="addStudent()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateStudentBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateStudent()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelStudentBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadStudents()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    Stored Students
+                    <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='https://srms-web-pci5.onrender.com/api/students/export'"><i class="fas fa-file-excel"></i> Export to CSV</button>
+                </div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Major</th><th>Actions</th></tr></thead><tbody id="studentTable"></tbody></table>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center bg-white">
+                    <button class="btn btn-outline-secondary btn-sm" id="prevBtn" onclick="changePage(-1)">Previous</button>
+                    <span id="pageInfo" class="text-muted fw-bold">Page 1</span>
+                    <button class="btn btn-outline-secondary btn-sm" id="nextBtn" onclick="changePage(1)">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COURSES -->
+        <div id="page-courses" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Course</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="courseId" class="form-control" placeholder="Course ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateCourseId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="courseName" class="form-control" placeholder="Course Name">
+                        <input type="number" id="credits" class="form-control" placeholder="Credits">
+                        <input type="text" id="department" class="form-control" placeholder="Department">
+                        <button id="addCourseBtn" class="btn btn-success text-nowrap" onclick="addCourse()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateCourseBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateCourse()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelCourseBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadCourses()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Courses</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Course ID</th><th>Course Name</th><th>Credits</th><th>Department</th><th>Actions</th></tr></thead><tbody id="courseTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TUTORS -->
+        <div id="page-tutors" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Tutor</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="tutorId" class="form-control" placeholder="Tutor ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateTutorId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="tutorFirstName" class="form-control" placeholder="First Name">
+                        <input type="text" id="tutorLastName" class="form-control" placeholder="Last Name">
+                        <input type="text" id="tutorDepartment" class="form-control" placeholder="Department">
+                        <button id="addTutorBtn" class="btn btn-success text-nowrap" onclick="addTutor()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateTutorBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateTutor()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelTutorBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadTutors()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Tutors</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Tutor ID</th><th>First Name</th><th>Last Name</th><th>Department</th><th>Actions</th></tr></thead><tbody id="tutorTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ENROLLMENTS -->
+        <div id="page-enrollments" class="page">
+            <div class="card border-success mb-4">
+                <div class="card-header text-success d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-bolt"></i> Bulk Enroll Students (Fast Way)</span>
+                    <span class="badge bg-success" id="selectedCount">0 Selected</span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3 g-2">
+                        <div class="col-md-4">
+                            <label class="form-label text-muted fw-bold">Select Course</label>
+                            <select id="bulkCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-muted fw-bold">Semester</label>
+                            <input type="number" id="bulkSemester" class="form-control" placeholder="e.g. 1" min="1" max="2">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-muted fw-bold">Year</label>
+                            <input type="number" id="bulkYear" class="form-control" placeholder="e.g. 2024">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-success w-100" onclick="bulkEnroll()"><i class="fas fa-check-double"></i> Enroll</button>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-2 gap-2">
+                        <label class="form-label text-muted fw-bold mb-0">Select Students:</label>
+                        <input type="text" id="bulkSearch" class="form-control" style="max-width: 300px;" placeholder="Search student by name..." onkeyup="filterBulkStudents()">
+                    </div>
+                    <div class="student-checkbox-list" id="studentCheckboxList"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Manual Enroll (Single Student)</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="enrollmentId" class="form-control" placeholder="Enrollment ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateEnrollmentId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="enrollStudentId" class="form-select"><option value="">-- Select Student --</option></select>
+                        <select id="enrollCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        <input type="number" id="semester" class="form-control" placeholder="Semester">
+                        <input type="number" id="year" class="form-control" placeholder="Year">
+                        <button id="addEnrollmentBtn" class="btn btn-success text-nowrap" onclick="addEnrollment()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateEnrollmentBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateEnrollment()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelEnrollmentBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadEnrollments()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    Stored Enrollments
+                    <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='https://srms-web-pci5.onrender.com/api/enrollments/export'"><i class="fas fa-file-excel"></i> Export to CSV</button>
+                </div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Enrollment ID</th><th>Student ID</th><th>Course ID</th><th>Sem</th><th>Year</th><th>Date</th><th>Actions</th></tr></thead><tbody id="enrollmentTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div id="page-results" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Examination Result</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="resultId" class="form-control" placeholder="Result ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateResultId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="resultEnrollmentId" class="form-select"><option value="">-- Select Enrollment --</option></select>
+                        <input type="number" id="score" class="form-control" placeholder="Score (0-100)" oninput="calculateGrade()">
+                        <input type="text" id="grade" class="form-control" placeholder="Grade" readonly>
+                        <input type="number" id="resultSemester" class="form-control" placeholder="Semester">
+                        <input type="number" id="resultYear" class="form-control" placeholder="Year">
+                        <button id="addResultBtn" class="btn btn-success text-nowrap" onclick="addResult()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateResultBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateResult()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelResultBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadResults()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Results</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Result ID</th><th>Enrollment ID</th><th>Score</th><th>Grade</th><th>Sem</th><th>Year</th><th>Actions</th></tr></thead><tbody id="resultTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALLOCATIONS -->
+        <div id="page-allocations" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Course Allocation</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="allocationId" class="form-control" placeholder="Allocation ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateAllocationId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="allocCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        <select id="allocTutorId" class="form-select"><option value="">-- Select Tutor --</option></select>
+                        <input type="number" id="allocSemester" class="form-control" placeholder="Semester">
+                        <input type="number" id="allocYear" class="form-control" placeholder="Year">
+                        <button id="addAllocBtn" class="btn btn-success text-nowrap" onclick="addAllocation()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateAllocBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateAllocation()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelAllocBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadAllocations()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Course Allocations</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Allocation ID</th><th>Course</th><th>Tutor</th><th>Semester</th><th>Year</th><th>Actions</th></tr></thead><tbody id="allocationTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- REPORTS -->
+        <div id="page-reports" class="page">
+            <div class="card">
+                <div class="card-header">Student Academic Transcript</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center mb-3">
+                        <select id="reportStudentSelect" class="form-select"><option value="">-- Select a Student --</option></select>
+                        <button class="btn btn-primary text-nowrap" onclick="generateTranscript()">Generate Report</button>
+                        <button class="btn btn-danger text-nowrap" onclick="downloadPdf()">Download PDF</button>
+                    </div>
+                    <div id="transcriptOutput" class="table-responsive"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuka University SRMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; overflow-x: hidden; }
+        
+        /* Desktop Sidebar */
+        .sidebar { height: 100vh; width: 260px; position: fixed; top: 0; left: 0; background-color: #1e293b; color: white; padding-top: 20px; z-index: 1000; overflow-y: auto; }
+        .sidebar h3 { text-align: center; font-weight: 700; margin-bottom: 30px; color: #38bdf8; font-size: 22px; }
+        .sidebar a { padding: 15px 25px; text-decoration: none; font-size: 16px; color: #cbd5e1; display: block; cursor: pointer; border-left: 4px solid transparent; }
+        .sidebar a:hover, .sidebar a.active { background-color: #0f172a; color: white; border-left: 4px solid #38bdf8; }
+        .sidebar a i { margin-right: 15px; width: 20px; text-align: center; }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; padding: 20px 40px; }
+        .top-navbar { background: white; padding: 15px 30px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Cards & Tables */
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; }
+        .card-header { background: white; font-weight: 600; color: #334155; padding: 15px 20px; border-bottom: 1px solid #f1f5f9; border-radius: 12px 12px 0 0 !important; }
+        .card-body { padding: 20px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .form-control, .form-select { border-radius: 8px; padding: 10px 15px; }
+        .table th { font-weight: 600; color: #64748b; }
+        
+        /* Chart Container */
+        .chart-container { position: relative; height: 300px; width: 100%; }
+
+        /* Mobile Hamburger Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: #1e293b;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .mobile-menu-btn { display: block; }
+            
+            .sidebar { 
+                transform: translateX(-100%); 
+                transition: 0.3s;
+                width: 250px; 
+            }
+            .sidebar.show { transform: translateX(0); }
+            
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            }
+            .sidebar-overlay.show { display: block; }
+            
+            .main-content { margin-left: 0; padding: 10px; }
+            .top-navbar { flex-direction: column; align-items: flex-start; gap: 10px; padding: 15px; }
+            .top-navbar .d-flex { flex-wrap: wrap; width: 100%; }
+            .top-navbar .input-group { width: 100% !important; margin-bottom: 10px; }
+            .card-body { padding: 15px; }
+            
+            .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            table { font-size: 13px; white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <h3><i class="fas fa-university"></i> Chuka SRMS</h3>
+        <a id="nav-dashboard" onclick="showPage('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</a>
+        <a id="nav-students" class="active" onclick="showPage('students')"><i class="fas fa-user-graduate"></i> Students</a>
+        <a id="nav-courses" onclick="showPage('courses')"><i class="fas fa-book"></i> Courses</a>
+        <a id="nav-tutors" onclick="showPage('tutors')"><i class="fas fa-chalkboard-teacher"></i> Tutors</a>
+        <a id="nav-enrollments" onclick="showPage('enrollments')"><i class="fas fa-clipboard-list"></i> Enrollments</a>
+        <a id="nav-results" onclick="showPage('results')"><i class="fas fa-file-alt"></i> Examination Results</a>
+        <a id="nav-allocations" onclick="showPage('allocations')"><i class="fas fa-tasks"></i> Course Allocation</a>
+        <a id="nav-reports" onclick="showPage('reports')"><i class="fas fa-chart-line"></i> Reports</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div class="top-navbar">
+            <h4 id="pageTitle" class="mb-0 fw-bold text-dark">Student Management</h4>
+            <div class="d-flex align-items-center gap-3">
+                <div class="input-group" id="searchContainer" style="width: 300px;">
+                    <input type="text" id="globalSearch" class="form-control" placeholder="Search students..." onkeyup="handleSearch(event)">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                </div>
+                <span class="text-muted"><i class="fas fa-user-circle fa-lg"></i> Admin</span>
+                <form action="/logout" method="post" class="mb-0"><button type="submit" class="btn btn-outline-danger btn-sm">Logout</button></form>
+            </div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="page-dashboard" class="page">
+            <div class="row">
+                <div class="col-md-6"><div class="card"><div class="card-header">Students by Major</div><div class="card-body"><div class="chart-container"><canvas id="majorChart"></canvas></div></div></div></div>
+                <div class="col-md-6"><div class="card"><div class="card-header">Enrollments by Semester</div><div class="card-body"><div class="chart-container"><canvas id="semesterChart"></canvas></div></div></div></div>
+            </div>
+        </div>
+
+        <!-- STUDENTS -->
+        <div id="page-students" class="page active">
+            <div class="card">
+                <div class="card-header">Add / Edit Student</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="studentId" class="form-control" placeholder="Student ID">
+                        <button id="generateStudentBtn" class="btn btn-secondary text-nowrap" onclick="generateStudentId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="firstName" class="form-control" placeholder="First Name">
+                        <input type="text" id="lastName" class="form-control" placeholder="Last Name">
+                        <input type="text" id="major" class="form-control" placeholder="Major">
+                        <button id="addStudentBtn" class="btn btn-success text-nowrap" onclick="addStudent()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateStudentBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateStudent()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelStudentBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadStudents()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    Stored Students
+                    <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='https://srms-web-pci5.onrender.com/api/students/export'"><i class="fas fa-file-excel"></i> Export to CSV</button>
+                </div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Major</th><th>Actions</th></tr></thead><tbody id="studentTable"></tbody></table>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center bg-white">
+                    <button class="btn btn-outline-secondary btn-sm" id="prevBtn" onclick="changePage(-1)">Previous</button>
+                    <span id="pageInfo" class="text-muted fw-bold">Page 1</span>
+                    <button class="btn btn-outline-secondary btn-sm" id="nextBtn" onclick="changePage(1)">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COURSES -->
+        <div id="page-courses" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Course</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="courseId" class="form-control" placeholder="Course ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateCourseId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="courseName" class="form-control" placeholder="Course Name">
+                        <input type="number" id="credits" class="form-control" placeholder="Credits">
+                        <input type="text" id="department" class="form-control" placeholder="Department">
+                        <button id="addCourseBtn" class="btn btn-success text-nowrap" onclick="addCourse()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateCourseBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateCourse()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelCourseBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadCourses()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Courses</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Course ID</th><th>Course Name</th><th>Credits</th><th>Department</th><th>Actions</th></tr></thead><tbody id="courseTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TUTORS -->
+        <div id="page-tutors" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Tutor</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="tutorId" class="form-control" placeholder="Tutor ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateTutorId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="tutorFirstName" class="form-control" placeholder="First Name">
+                        <input type="text" id="tutorLastName" class="form-control" placeholder="Last Name">
+                        <input type="text" id="tutorDepartment" class="form-control" placeholder="Department">
+                        <button id="addTutorBtn" class="btn btn-success text-nowrap" onclick="addTutor()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateTutorBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateTutor()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelTutorBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadTutors()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Tutors</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Tutor ID</th><th>First Name</th><th>Last Name</th><th>Department</th><th>Actions</th></tr></thead><tbody id="tutorTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ENROLLMENTS -->
+        <div id="page-enrollments" class="page">
+            <div class="card border-success mb-4">
+                <div class="card-header text-success d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-bolt"></i> Bulk Enroll Students (Fast Way)</span>
+                    <span class="badge bg-success" id="selectedCount">0 Selected</span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3 g-2">
+                        <div class="col-md-4">
+                            <label class="form-label text-muted fw-bold">Select Course</label>
+                            <select id="bulkCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-muted fw-bold">Semester</label>
+                            <input type="number" id="bulkSemester" class="form-control" placeholder="e.g. 1" min="1" max="2">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-muted fw-bold">Year</label>
+                            <input type="number" id="bulkYear" class="form-control" placeholder="e.g. 2024">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-success w-100" onclick="bulkEnroll()"><i class="fas fa-check-double"></i> Enroll</button>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-2 gap-2">
+                        <label class="form-label text-muted fw-bold mb-0">Select Students:</label>
+                        <input type="text" id="bulkSearch" class="form-control" style="max-width: 300px;" placeholder="Search student by name..." onkeyup="filterBulkStudents()">
+                    </div>
+                    <div class="student-checkbox-list" id="studentCheckboxList"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Manual Enroll (Single Student)</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="enrollmentId" class="form-control" placeholder="Enrollment ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateEnrollmentId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="enrollStudentId" class="form-select"><option value="">-- Select Student --</option></select>
+                        <select id="enrollCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        <input type="number" id="semester" class="form-control" placeholder="Semester">
+                        <input type="number" id="year" class="form-control" placeholder="Year">
+                        <button id="addEnrollmentBtn" class="btn btn-success text-nowrap" onclick="addEnrollment()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateEnrollmentBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateEnrollment()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelEnrollmentBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadEnrollments()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    Stored Enrollments
+                    <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='https://srms-web-pci5.onrender.com/api/enrollments/export'"><i class="fas fa-file-excel"></i> Export to CSV</button>
+                </div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Enrollment ID</th><th>Student ID</th><th>Course ID</th><th>Sem</th><th>Year</th><th>Date</th><th>Actions</th></tr></thead><tbody id="enrollmentTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div id="page-results" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Examination Result</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="resultId" class="form-control" placeholder="Result ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateResultId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="resultEnrollmentId" class="form-select"><option value="">-- Select Enrollment --</option></select>
+                        <input type="number" id="score" class="form-control" placeholder="Score (0-100)" oninput="calculateGrade()">
+                        <input type="text" id="grade" class="form-control" placeholder="Grade" readonly>
+                        <input type="number" id="resultSemester" class="form-control" placeholder="Semester">
+                        <input type="number" id="resultYear" class="form-control" placeholder="Year">
+                        <button id="addResultBtn" class="btn btn-success text-nowrap" onclick="addResult()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateResultBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateResult()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelResultBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadResults()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Results</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Result ID</th><th>Enrollment ID</th><th>Score</th><th>Grade</th><th>Sem</th><th>Year</th><th>Actions</th></tr></thead><tbody id="resultTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALLOCATIONS -->
+        <div id="page-allocations" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Course Allocation</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="allocationId" class="form-control" placeholder="Allocation ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateAllocationId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="allocCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        <select id="allocTutorId" class="form-select"><option value="">-- Select Tutor --</option></select>
+                        <input type="number" id="allocSemester" class="form-control" placeholder="Semester">
+                        <input type="number" id="allocYear" class="form-control" placeholder="Year">
+                        <button id="addAllocBtn" class="btn btn-success text-nowrap" onclick="addAllocation()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateAllocBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateAllocation()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelAllocBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadAllocations()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Course Allocations</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Allocation ID</th><th>Course</th><th>Tutor</th><th>Semester</th><th>Year</th><th>Actions</th></tr></thead><tbody id="allocationTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- REPORTS -->
+        <div id="page-reports" class="page">
+            <div class="card">
+                <div class="card-header">Student Academic Transcript</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center mb-3">
+                        <select id="reportStudentSelect" class="form-select"><option value="">-- Select a Student --</option></select>
+                        <button class="btn btn-primary text-nowrap" onclick="generateTranscript()">Generate Report</button>
+                        <button class="btn btn-danger text-nowrap" onclick="downloadPdf()">Download PDF</button>
+                    </div>
+                    <div id="transcriptOutput" class="table-responsive"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuka University SRMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; overflow-x: hidden; }
+        
+        /* Desktop Sidebar */
+        .sidebar { height: 100vh; width: 260px; position: fixed; top: 0; left: 0; background-color: #1e293b; color: white; padding-top: 20px; z-index: 1000; overflow-y: auto; }
+        .sidebar h3 { text-align: center; font-weight: 700; margin-bottom: 30px; color: #38bdf8; font-size: 22px; }
+        .sidebar a { padding: 15px 25px; text-decoration: none; font-size: 16px; color: #cbd5e1; display: block; cursor: pointer; border-left: 4px solid transparent; }
+        .sidebar a:hover, .sidebar a.active { background-color: #0f172a; color: white; border-left: 4px solid #38bdf8; }
+        .sidebar a i { margin-right: 15px; width: 20px; text-align: center; }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; padding: 20px 40px; }
+        .top-navbar { background: white; padding: 15px 30px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Cards & Tables */
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; }
+        .card-header { background: white; font-weight: 600; color: #334155; padding: 15px 20px; border-bottom: 1px solid #f1f5f9; border-radius: 12px 12px 0 0 !important; }
+        .card-body { padding: 20px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .form-control, .form-select { border-radius: 8px; padding: 10px 15px; }
+        .table th { font-weight: 600; color: #64748b; }
+        
+        /* Chart Container */
+        .chart-container { position: relative; height: 300px; width: 100%; }
+
+        /* Mobile Hamburger Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: #1e293b;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .mobile-menu-btn { display: block; }
+            
+            .sidebar { 
+                transform: translateX(-100%); 
+                transition: 0.3s;
+                width: 250px; 
+            }
+            .sidebar.show { transform: translateX(0); }
+            
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            }
+            .sidebar-overlay.show { display: block; }
+            
+            .main-content { margin-left: 0; padding: 10px; }
+            .top-navbar { flex-direction: column; align-items: flex-start; gap: 10px; padding: 15px; }
+            .top-navbar .d-flex { flex-wrap: wrap; width: 100%; }
+            .top-navbar .input-group { width: 100% !important; margin-bottom: 10px; }
+            .card-body { padding: 15px; }
+            
+            .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            table { font-size: 13px; white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <h3><i class="fas fa-university"></i> Chuka SRMS</h3>
+        <a id="nav-dashboard" onclick="showPage('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</a>
+        <a id="nav-students" class="active" onclick="showPage('students')"><i class="fas fa-user-graduate"></i> Students</a>
+        <a id="nav-courses" onclick="showPage('courses')"><i class="fas fa-book"></i> Courses</a>
+        <a id="nav-tutors" onclick="showPage('tutors')"><i class="fas fa-chalkboard-teacher"></i> Tutors</a>
+        <a id="nav-enrollments" onclick="showPage('enrollments')"><i class="fas fa-clipboard-list"></i> Enrollments</a>
+        <a id="nav-results" onclick="showPage('results')"><i class="fas fa-file-alt"></i> Examination Results</a>
+        <a id="nav-allocations" onclick="showPage('allocations')"><i class="fas fa-tasks"></i> Course Allocation</a>
+        <a id="nav-reports" onclick="showPage('reports')"><i class="fas fa-chart-line"></i> Reports</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div class="top-navbar">
+            <h4 id="pageTitle" class="mb-0 fw-bold text-dark">Student Management</h4>
+            <div class="d-flex align-items-center gap-3">
+                <div class="input-group" id="searchContainer" style="width: 300px;">
+                    <input type="text" id="globalSearch" class="form-control" placeholder="Search students..." onkeyup="handleSearch(event)">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                </div>
+                <span class="text-muted"><i class="fas fa-user-circle fa-lg"></i> Admin</span>
+                <form action="/logout" method="post" class="mb-0"><button type="submit" class="btn btn-outline-danger btn-sm">Logout</button></form>
+            </div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="page-dashboard" class="page">
+            <div class="row">
+                <div class="col-md-6"><div class="card"><div class="card-header">Students by Major</div><div class="card-body"><div class="chart-container"><canvas id="majorChart"></canvas></div></div></div></div>
+                <div class="col-md-6"><div class="card"><div class="card-header">Enrollments by Semester</div><div class="card-body"><div class="chart-container"><canvas id="semesterChart"></canvas></div></div></div></div>
+            </div>
+        </div>
+
+        <!-- STUDENTS -->
+        <div id="page-students" class="page active">
+            <div class="card">
+                <div class="card-header">Add / Edit Student</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="studentId" class="form-control" placeholder="Student ID">
+                        <button id="generateStudentBtn" class="btn btn-secondary text-nowrap" onclick="generateStudentId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="firstName" class="form-control" placeholder="First Name">
+                        <input type="text" id="lastName" class="form-control" placeholder="Last Name">
+                        <input type="text" id="major" class="form-control" placeholder="Major">
+                        <button id="addStudentBtn" class="btn btn-success text-nowrap" onclick="addStudent()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateStudentBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateStudent()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelStudentBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadStudents()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    Stored Students
+                    <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='https://srms-web-pci5.onrender.com/api/students/export'"><i class="fas fa-file-excel"></i> Export to CSV</button>
+                </div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Major</th><th>Actions</th></tr></thead><tbody id="studentTable"></tbody></table>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center bg-white">
+                    <button class="btn btn-outline-secondary btn-sm" id="prevBtn" onclick="changePage(-1)">Previous</button>
+                    <span id="pageInfo" class="text-muted fw-bold">Page 1</span>
+                    <button class="btn btn-outline-secondary btn-sm" id="nextBtn" onclick="changePage(1)">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COURSES -->
+        <div id="page-courses" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Course</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="courseId" class="form-control" placeholder="Course ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateCourseId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="courseName" class="form-control" placeholder="Course Name">
+                        <input type="number" id="credits" class="form-control" placeholder="Credits">
+                        <input type="text" id="department" class="form-control" placeholder="Department">
+                        <button id="addCourseBtn" class="btn btn-success text-nowrap" onclick="addCourse()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateCourseBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateCourse()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelCourseBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadCourses()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Courses</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Course ID</th><th>Course Name</th><th>Credits</th><th>Department</th><th>Actions</th></tr></thead><tbody id="courseTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TUTORS -->
+        <div id="page-tutors" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Tutor</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="tutorId" class="form-control" placeholder="Tutor ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateTutorId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <input type="text" id="tutorFirstName" class="form-control" placeholder="First Name">
+                        <input type="text" id="tutorLastName" class="form-control" placeholder="Last Name">
+                        <input type="text" id="tutorDepartment" class="form-control" placeholder="Department">
+                        <button id="addTutorBtn" class="btn btn-success text-nowrap" onclick="addTutor()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateTutorBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateTutor()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelTutorBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadTutors()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Tutors</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Tutor ID</th><th>First Name</th><th>Last Name</th><th>Department</th><th>Actions</th></tr></thead><tbody id="tutorTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ENROLLMENTS -->
+        <div id="page-enrollments" class="page">
+            <div class="card border-success mb-4">
+                <div class="card-header text-success d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-bolt"></i> Bulk Enroll Students (Fast Way)</span>
+                    <span class="badge bg-success" id="selectedCount">0 Selected</span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3 g-2">
+                        <div class="col-md-4">
+                            <label class="form-label text-muted fw-bold">Select Course</label>
+                            <select id="bulkCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-muted fw-bold">Semester</label>
+                            <input type="number" id="bulkSemester" class="form-control" placeholder="e.g. 1" min="1" max="2">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-muted fw-bold">Year</label>
+                            <input type="number" id="bulkYear" class="form-control" placeholder="e.g. 2024">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-success w-100" onclick="bulkEnroll()"><i class="fas fa-check-double"></i> Enroll</button>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-2 gap-2">
+                        <label class="form-label text-muted fw-bold mb-0">Select Students:</label>
+                        <input type="text" id="bulkSearch" class="form-control" style="max-width: 300px;" placeholder="Search student by name..." onkeyup="filterBulkStudents()">
+                    </div>
+                    <div class="student-checkbox-list" id="studentCheckboxList"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Manual Enroll (Single Student)</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="enrollmentId" class="form-control" placeholder="Enrollment ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateEnrollmentId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="enrollStudentId" class="form-select"><option value="">-- Select Student --</option></select>
+                        <select id="enrollCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        <input type="number" id="semester" class="form-control" placeholder="Semester">
+                        <input type="number" id="year" class="form-control" placeholder="Year">
+                        <button id="addEnrollmentBtn" class="btn btn-success text-nowrap" onclick="addEnrollment()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateEnrollmentBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateEnrollment()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelEnrollmentBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadEnrollments()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    Stored Enrollments
+                    <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='https://srms-web-pci5.onrender.com/api/enrollments/export'"><i class="fas fa-file-excel"></i> Export to CSV</button>
+                </div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Enrollment ID</th><th>Student ID</th><th>Course ID</th><th>Sem</th><th>Year</th><th>Date</th><th>Actions</th></tr></thead><tbody id="enrollmentTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div id="page-results" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Examination Result</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="resultId" class="form-control" placeholder="Result ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateResultId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="resultEnrollmentId" class="form-select"><option value="">-- Select Enrollment --</option></select>
+                        <input type="number" id="score" class="form-control" placeholder="Score (0-100)" oninput="calculateGrade()">
+                        <input type="text" id="grade" class="form-control" placeholder="Grade" readonly>
+                        <input type="number" id="resultSemester" class="form-control" placeholder="Semester">
+                        <input type="number" id="resultYear" class="form-control" placeholder="Year">
+                        <button id="addResultBtn" class="btn btn-success text-nowrap" onclick="addResult()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateResultBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateResult()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelResultBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadResults()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Results</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Result ID</th><th>Enrollment ID</th><th>Score</th><th>Grade</th><th>Sem</th><th>Year</th><th>Actions</th></tr></thead><tbody id="resultTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALLOCATIONS -->
+        <div id="page-allocations" class="page">
+            <div class="card">
+                <div class="card-header">Add / Edit Course Allocation</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+                        <input type="text" id="allocationId" class="form-control" placeholder="Allocation ID">
+                        <button class="btn btn-secondary text-nowrap" onclick="generateAllocationId()"><i class="fas fa-magic"></i> Generate ID</button>
+                        <select id="allocCourseId" class="form-select"><option value="">-- Select Course --</option></select>
+                        <select id="allocTutorId" class="form-select"><option value="">-- Select Tutor --</option></select>
+                        <input type="number" id="allocSemester" class="form-control" placeholder="Semester">
+                        <input type="number" id="allocYear" class="form-control" placeholder="Year">
+                        <button id="addAllocBtn" class="btn btn-success text-nowrap" onclick="addAllocation()"><i class="fas fa-save"></i> Save</button>
+                        <button id="updateAllocBtn" class="btn btn-primary text-nowrap" style="display:none;" onclick="updateAllocation()"><i class="fas fa-edit"></i> Update</button>
+                        <button id="cancelAllocBtn" class="btn btn-danger text-nowrap" style="display:none;" onclick="loadAllocations()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Stored Course Allocations</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped"><thead><tr><th>Allocation ID</th><th>Course</th><th>Tutor</th><th>Semester</th><th>Year</th><th>Actions</th></tr></thead><tbody id="allocationTable"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- REPORTS -->
+        <div id="page-reports" class="page">
+            <div class="card">
+                <div class="card-header">Student Academic Transcript</div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center mb-3">
+                        <select id="reportStudentSelect" class="form-select"><option value="">-- Select a Student --</option></select>
+                        <button class="btn btn-primary text-nowrap" onclick="generateTranscript()">Generate Report</button>
+                        <button class="btn btn-danger text-nowrap" onclick="downloadPdf()">Download PDF</button>
+                    </div>
+                    <div id="transcriptOutput" class="table-responsive"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>v
