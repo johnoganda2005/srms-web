@@ -71,87 +71,57 @@
 }
 
               /* Mobile Responsiveness (Hamburger Drawer) */
-        @media (max-width: 768px) {
-            body { padding: 0 !important; margin: 0 !important; }
-            
-            /* Hide the sidebar off-screen by default */
+              @media (max-width: 768px) {
             .sidebar {
-                left: -260px !important; 
-                transition: left 0.3s ease-in-out;
-                width: 260px !important;
-                height: 100vh !important;
-                position: fixed !important;
-            }
-                            /* Fix for mobile tables */
-            .table-responsive {
-                display: block;
                 width: 100%;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
+                height: auto;
+                position: relative;
+                padding-bottom: 10px;
             }
-            table {
-                width: 100% !important;
-                min-width: 500px; /* Forces the table to be wide enough so buttons don't stack */
-            }
-            table td, table th {
-                white-space: nowrap; /* Prevents text from wrapping weirdly */
-                vertical-align: middle;
-            }
-            /* Make buttons smaller on mobile */
-            table .btn {
-                padding: 4px 8px !important;
-                font-size: 11px !important;
-                display: inline-block !important;
-                margin: 0 2px !important;
-            }
-            /* Optional: Hide the text in the buttons and just show icons to save space */
-            table .btn i {
-                margin-right: 0 !important;
-            }
-            
-            /* Class to open the sidebar */
-            .sidebar.active {
-                left: 0 !important;
-            }
-            
-            .main-content {
-                margin-left: 0 !important;
-                padding: 15px !important;
-            }
-            
-            /* Add the hamburger button to the top navbar */
-            .hamburger-btn {
-                display: block !important;
-                background: #1e293b;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                padding: 8px 12px;
+            .sidebar h3 {
+                margin-bottom: 15px;
                 font-size: 20px;
-                cursor: pointer;
-                margin-right: 15px;
             }
-            
-            /* Adjust top navbar for mobile */
+            .sidebar a {
+                display: inline-block;
+                padding: 10px 15px;
+                border-left: none;
+                border-bottom: 2px solid transparent;
+                font-size: 14px;
+            }
+            .sidebar a.active {
+                border-bottom: 2px solid #38bdf8;
+            }
+            .sidebar a i {
+                margin-right: 5px;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 10px;
+            }
             .top-navbar {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: flex-start;
-                flex-wrap: wrap;
+                flex-direction: column;
+                align-items: flex-start;
                 gap: 10px;
-                padding: 10px !important;
             }
-                
-            .top-navbar h4 { margin-left: 55px; }
+            .top-navbar .d-flex {
+                flex-wrap: wrap;
+                width: 100%;
+            }
             .top-navbar .input-group {
                 width: 100% !important;
-                margin-top: 10px;
             }
-            
-            .card-body { padding: 15px !important; }
-            .table-responsive { overflow-x: auto; }
-            table { font-size: 12px; }
+            .card-body {
+                padding: 10px;
+            }
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            }
+            table {
+                font-size: 12px;
+                white-space: nowrap; /* Prevents text from breaking into multiple lines */
+            }
         }
         .student-checkbox-label:hover { background-color: #e2e8f0 !important; }
     </style>
