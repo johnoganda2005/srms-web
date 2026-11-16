@@ -31,10 +31,9 @@ public class StudentController {
         return repository.findAll(PageRequest.of(page, size));
     }
 
-    @PostMapping
+       @PostMapping
     public ResponseEntity<?> addStudent(@RequestBody Student student) {
         try {
-            // Check if student already exists
             if (repository.existsById(student.getStudentId())) {
                 Map<String, String> response = new HashMap<>();
                 response.put("error", "Student ID '" + student.getStudentId() + "' already exists!");
@@ -47,7 +46,6 @@ public class StudentController {
             return ResponseEntity.badRequest().body(response);
         }
     }
-
     @PutMapping("/{id}")
     public ResponseEntity<?> updateStudent(@PathVariable String id, @RequestBody Student student) {
         try {
