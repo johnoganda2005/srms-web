@@ -61,7 +61,7 @@ function changePage(direction) { currentPage += direction; loadStudents(); }
 function addStudent() {
     const student = { studentId: document.getElementById('studentId').value, firstName: document.getElementById('firstName').value, lastName: document.getElementById('lastName').value, major: document.getElementById('major').value, dateOfBirth: "2000-01-01", currentSemester: 1, currentYear: 1, academicStatus: "Active" };
     
-    fetch('http://localhost:8080/api/students', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(student) })
+    fetch('https://srms-web-pci5.onrender.com/api/students', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(student) })
     .then(async res => { 
         if (!res.ok) { 
             const err = await res.json(); 
