@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration - Chuka SRMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #1e293b; height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; padding: 15px; }
+        .card-box { width: 100%; max-width: 500px; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); background: white; }
+    </style>
+</head>
+<body>
+    <div class="card-box">
+        <h3 class="text-center fw-bold mb-4" style="color: #1e293b;">Student Registration</h3>
+        <div id="messageBox" class="alert" style="display:none;"></div>
+        
+        <form id="regForm">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">First Name</label>
+                    <input type="text" name="firstName" class="form-control" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Last Name</label>
+                    <input type="text" name="lastName" class="form-control" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Email Address</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Password</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-bold">Major</label>
+                <input type="text" name="major" class="form-control" placeholder="e.g. Computer Science" required>
+            </div>
+            <button type="submit" class="btn btn-success w-100 fw-bold">Register</button>
+            <a href="/login" class="btn btn-link w-100 mt-2">Back to Admin Login</a>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('regForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Note: This uses your live Render URL
+            fetch('https://srms-web-pci5.onrender.com/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(result => {
+                const msgBox = document.getElementById('messageBox');
+                msgBox.style.display = 'block';
+                if (result.message) {
+                    msgBox.className = 'alert alert-success';
+                    msgBox.innerText = result.message;
+                    document.getElementById('regForm').reset();
+                } else {
+                    msgBox.className = 'alert alert-danger';
+                    msgBox.innerText = result.error;
+                }
+            })
+            .catch(err => {
+                const msgBox = document.getElementById('messageBox');
+                msgBox.style.display = 'block';
+                msgBox.className = 'alert alert-danger';
+                msgBox.innerText = "Connection error. Please try again.";
+            });
+        });
+    </script>
+</body>
+</html>
