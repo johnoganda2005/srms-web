@@ -52,7 +52,7 @@ public class SecurityConfig {
                 AdminUser newAdmin = new AdminUser();
                 newAdmin.setUsername("admin");
                 newAdmin.setPassword(encoder.encode("admin123"));
-                newAdmin.setEmail("YOUR_GMAIL_ADDRESS@gmail.com"); // <-- CHANGE THIS TO YOUR REAL EMAIL
+                newAdmin.setEmail("johnoganda75@gmail.com"); 
                 adminUserRepository.save(newAdmin);
                 admin = newAdmin;
             }
