@@ -34,9 +34,15 @@ function showPage(pageName) {
     document.getElementById('nav-' + pageName).classList.add('active');
 
     const titles = {
-        'dashboard': 'Dashboard Overview', 'students': 'Student Management', 'courses': 'Course Management',
-        'tutors': 'Tutor Management', 'enrollments': 'Enrollment Management', 'results': 'Examination Results',
-        'allocations': 'Course Allocation', 'reports': 'Academic Reports'
+        'dashboard': 'Dashboard Overview', 
+        'students': 'Student Management', 
+        'registrations': 'Student Registrations',
+        'courses': 'Course Management',
+        'tutors': 'Tutor Management', 
+        'enrollments': 'Enrollment Management', 
+        'results': 'Examination Results',
+        'allocations': 'Course Allocation', 
+        'reports': 'Academic Reports'
     };
     document.getElementById('pageTitle').innerText = titles[pageName];
 
@@ -45,6 +51,7 @@ function showPage(pageName) {
 
     if (pageName === 'dashboard') loadCharts();
     if (pageName === 'students') { currentPage = 0; loadStudents(); }
+    if (pageName === 'registrations') loadRegistrations();
     if (pageName === 'courses') loadCourses();
     if (pageName === 'tutors') loadTutors();
     if (pageName === 'enrollments') { loadEnrollments(); loadEnrollmentDropdowns(); }
@@ -156,6 +163,28 @@ function handleSearch(event) {
             document.getElementById('prevBtn').disabled = true; document.getElementById('nextBtn').disabled = true;
         });
     }
+}
+
+// REGISTRATIONS (NEW)
+function loadRegistrations() {
+    fetch('https://srms-web-pci5.onrender.com/api/register')
+        .then(res => res.json())
+        .then(data => {
+            const table = document.getElementById('registrationTable');
+            table.innerHTML = '';
+            if (data.length === 0) {
+                table.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">No pending registrations.</td></tr>';
+                return;
+            }
+            data.forEach(r => {
+                table.innerHTML += `<tr>
+                    <td>${r.firstName} ${r.lastName}</td>
+                    <td>${r.email}</td>
+                    <td>${r.major}</td>
+                    <td>${new Date(r.createdAt).toLocaleDateString()}</td>
+                </tr>`;
+            });
+        });
 }
 
 // COURSES
@@ -308,34 +337,4 @@ function loadAllocations() {
 function addAllocation() { const a = { allocationId: document.getElementById('allocationId').value, courseId: document.getElementById('allocCourseId').value, tutorId: document.getElementById('allocTutorId').value, semester: parseInt(document.getElementById('allocSemester').value), year: parseInt(document.getElementById('allocYear').value) }; fetch('https://srms-web-pci5.onrender.com/api/allocations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) }).then(() => loadAllocations()); }
 function updateAllocation() { const id = document.getElementById('allocationId').value; const a = { allocationId: id, courseId: document.getElementById('allocCourseId').value, tutorId: document.getElementById('allocTutorId').value, semester: parseInt(document.getElementById('allocSemester').value), year: parseInt(document.getElementById('allocYear').value) }; fetch(`https://srms-web-pci5.onrender.com/api/allocations/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) }).then(() => loadAllocations()); }
 function deleteAllocation(id) { if(confirm("Delete this allocation?")) fetch(`https://srms-web-pci5.onrender.com/api/allocations/${id}`, { method: 'DELETE' }).then(() => loadAllocations()); }
-function editAllocation(id, course, tutor, sem, year) { document.getElementById('allocationId').value = id; document.getElementById('allocationId').readOnly = true; document.getElementById('allocCourseId').value = course; document.getElementById('allocTutorId').value = tutor; document.getElementById('allocSemester').value = sem; document.getElementById('allocYear').value = year; document.getElementById('addAllocBtn').style.display = 'none'; document.getElementById('updateAllocBtn').style.display = 'inline-block'; document.getElementById('cancelAllocBtn').style.display = 'inline-block'; }
-function resetAllocationForm() { document.getElementById('allocationId').value = ''; document.getElementById('allocationId').readOnly = false; document.getElementById('allocCourseId').value = ''; document.getElementById('allocTutorId').value = ''; document.getElementById('allocSemester').value = ''; document.getElementById('allocYear').value = ''; document.getElementById('addAllocBtn').style.display = 'inline-block'; document.getElementById('updateAllocBtn').style.display = 'none'; document.getElementById('cancelAllocBtn').style.display = 'none'; }
-
-// REPORTS
-function loadReportDropdown() { fetch('https://srms-web-pci5.onrender.com/api/students?size=2000').then(res => res.json()).then(data => { const select = document.getElementById('reportStudentSelect'); select.innerHTML = '<option value="">-- Select a Student --</option>'; data.content.forEach(s => { select.innerHTML += `<option value="${s.studentId}">${s.studentId} - ${s.firstName} ${s.lastName}</option>`; }); }); }
-function generateTranscript() {
-    const studentId = document.getElementById('reportStudentSelect').value; if (!studentId) { alert("Please select a student first!"); return; }
-    const outputDiv = document.getElementById('transcriptOutput'); outputDiv.innerHTML = '<p>Loading transcript...</p>';
-    fetch(`https://srms-web-pci5.onrender.com/api/reports/transcript/${studentId}`).then(res => res.json()).then(data => {
-        if (data.error) { outputDiv.innerHTML = `<p style="color:red;">${data.error}</p>`; return; }
-        const s = data.student; const enrollments = data.enrollments; const results = data.results;
-        let html = `<div class="transcript-card"><div class="student-header"><h3>${s.firstName} ${s.lastName}</h3><p>ID: ${s.studentId} | Major: ${s.major}</p></div><table class="table table-bordered"><thead><tr><th>Course ID</th><th>Enrollment ID</th><th>Semester</th><th>Year</th><th>Score</th><th>Grade</th></tr></thead><tbody>`;
-        let totalPoints = 0; let count = 0;
-        enrollments.forEach(e => {
-            const result = results.find(r => r.enrollmentId === e.enrollmentId);
-            if (result) { if (result.grade === "A") totalPoints += 4.0; else if (result.grade === "B") totalPoints += 3.0; else if (result.grade === "C") totalPoints += 2.0; else if (result.grade === "D") totalPoints += 1.0; count++; }
-            html += `<tr><td>${e.courseId}</td><td>${e.enrollmentId}</td><td>${e.semester}</td><td>${e.year}</td><td>${result ? result.score : "-"}</td><td>${result ? result.grade : "-"}</td></tr>`;
-        });
-        html += `</tbody></table>`;
-        if (count > 0) html += `<div style="margin-top:20px; font-size:20px; font-weight:bold; color:#28a745;">Cumulative GPA: ${(totalPoints / count).toFixed(2)}</div>`;
-        else html += `<div style="margin-top:20px; color:#7f8c8d;">No graded courses yet.</div>`;
-        html += `</div>`; outputDiv.innerHTML = html;
-    });
-}
-function downloadPdf() { const studentId = document.getElementById('reportStudentSelect').value; if (!studentId) { alert("Please select a student first!"); return; } window.location.href = `https://srms-web-pci5.onrender.com/api/reports/transcript/${studentId}/pdf`; }
-
-// CHARTS
-function loadCharts() {
-    fetch('https://srms-web-pci5.onrender.com/api/students/stats/majors').then(res => res.json()).then(data => { if (majorChartInstance) majorChartInstance.destroy(); majorChartInstance = new Chart(document.getElementById('majorChart').getContext('2d'), { type: 'pie', data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: ['#38bdf8', '#28a745', '#f39c12', '#e74c3c', '#8e44ad', '#34495e'] }] }, options: { responsive: true, maintainAspectRatio: false } }); });
-    fetch('https://srms-web-pci5.onrender.com/api/enrollments/stats/semesters').then(res => res.json()).then(data => { if (semesterChartInstance) semesterChartInstance.destroy(); semesterChartInstance = new Chart(document.getElementById('semesterChart').getContext('2d'), { type: 'bar', data: { labels: Object.keys(data), datasets: [{ label: 'Enrollments', data: Object.values(data), backgroundColor: '#1e293b' }] }, options: { responsive: true, maintainAspectRatio: false } }); });
-}
+function editAllocation(id, course, tutor, sem, year) { document.getElementById('allocation
