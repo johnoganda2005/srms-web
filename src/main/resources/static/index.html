@@ -89,6 +89,7 @@
         <h3><i class="fas fa-university"></i> Chuka SRMS</h3>
         <a id="nav-dashboard" onclick="showPage('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</a>
         <a id="nav-students" class="active" onclick="showPage('students')"><i class="fas fa-user-graduate"></i> Students</a>
+        <a id="nav-registrations" onclick="showPage('registrations')"><i class="fas fa-user-plus"></i> Registrations</a>
         <a id="nav-courses" onclick="showPage('courses')"><i class="fas fa-book"></i> Courses</a>
         <a id="nav-tutors" onclick="showPage('tutors')"><i class="fas fa-chalkboard-teacher"></i> Tutors</a>
         <a id="nav-enrollments" onclick="showPage('enrollments')"><i class="fas fa-clipboard-list"></i> Enrollments</a>
@@ -149,6 +150,19 @@
                     <button class="btn btn-outline-secondary btn-sm" id="prevBtn" onclick="changePage(-1)">Previous</button>
                     <span id="pageInfo" class="text-muted fw-bold">Page 1</span>
                     <button class="btn btn-outline-secondary btn-sm" id="nextBtn" onclick="changePage(1)">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- REGISTRATIONS -->
+        <div id="page-registrations" class="page">
+            <div class="card">
+                <div class="card-header">Pending Student Registrations</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead><tr><th>Name</th><th>Email</th><th>Major</th><th>Date</th></tr></thead>
+                        <tbody id="registrationTable"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
