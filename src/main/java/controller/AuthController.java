@@ -1,7 +1,9 @@
 package com.chuka.srms.controller;
 
 import com.chuka.srms.model.AdminUser;
+import com.chuka.srms.model.Student; // Added for registration
 import com.chuka.srms.repository.AdminUserRepository;
+import com.chuka.srms.repository.StudentRepository; // Added for registration
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -20,15 +22,70 @@ public class AuthController {
     private AdminUserRepository adminRepo;
 
     @Autowired
+    private StudentRepository studentRepo; // Injecting StudentRepo
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private JavaMailSender mailSender;
 
+    // ==========================================
+    // LOGIN & REGISTRATION ROUTES
+    // ==========================================
+
     @GetMapping("/login")
     public String login() {
         return "login";
     }
+
+    // 1. Show the Student Registration Page
+    @GetMapping("/register")
+    public String showRegisterForm() {
+        return "register";
+    }
+
+    // 2. Process Student Registration
+    @PostMapping("/register")
+    public String processRegistration(
+            @RequestParam String fullName,
+            @RequestParam String email,
+            @RequestParam String password,
+            @RequestParam String course,
+            Model model) {
+        
+        try {
+            // Check if email already exists in Student DB
+            if (studentRepo.findAll().stream().anyMatch(s -> s.getEmail().equalsIgnoreCase(email))) {
+                model.addAttribute("error", "Email is already registered!");
+                return "register";
+            }
+
+            // Create new Student
+            Student newStudent = new Student();
+            newStudent.setFullName(fullName);
+            newStudent.setEmail(email);
+            // We should hash the password so it matches security requirements
+            newStudent.setPassword(passwordEncoder.encode(password)); 
+            newStudent.setCourse(course);
+            
+            // Assuming you added the ApprovalStatus enum to your Student model:
+            // newStudent.setStatus(ApprovalStatus.PENDING); 
+
+            studentRepo.save(newStudent);
+            
+            model.addAttribute("success", "Registration successful! Please wait for admin approval before logging in.");
+            return "login"; // Redirect to login page with success message
+            
+        } catch (Exception e) {
+            model.addAttribute("error", "Registration failed: " + e.getMessage());
+            return "register";
+        }
+    }
+
+    // ==========================================
+    // FORGOT PASSWORD ROUTES (Your existing code)
+    // ==========================================
 
     @GetMapping("/forgot-password")
     public String forgotPassword() {
