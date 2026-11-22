@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - Chuka SRMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .navbar { margin-bottom: 20px; }
+        .table-actions form { display: inline-block; }
+    </style>
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-dark bg-dark px-3">
+    <a class="navbar-brand" href="#">Chuka SRMS - Admin Portal</a>
+    <form action="/logout" method="post" class="d-flex">
+        <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
+    </form>
+</nav>
+
+<div class="container">
+    
+    <!-- Success / Error Messages -->
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <!-- Pending Students Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Pending Student Registrations</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Major</th>
+                        <th>Registered On</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Loop through pending students -->
+                    <tr th:each="student : ${pendingStudents}">
+                        <td th:text="${student.firstName + ' ' + student.lastName}"></td>
+                        <td th:text="${student.email}"></td>
+                        <td th:text="${student.major}"></td>
+                        <td th:text="${#temporals.format(student.dateRegistered, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td class="table-actions">
+                            <!-- Approve Button -->
+                            <form th:action="@{/admin/approve/{id}(id=${student.id})}" method="post">
+                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                            </form>
+                            <!-- Reject Button -->
+                            <form th:action="@{/admin/reject/{id}(id=${student.id})}" method="post">
+                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <!-- If no pending students -->
+                    <tr th:if="${#lists.isEmpty(pendingStudents)}">
+                        <td colspan="5" class="text-center text-muted">No pending registrations at the moment.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
