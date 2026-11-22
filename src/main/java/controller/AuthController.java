@@ -55,8 +55,8 @@ public class AuthController {
             Model model) {
         
         try {
-            // Check if email already exists
-            if (studentRepo.findAll().stream().anyMatch(s -> s.getEmail() != null && s.getEmail().equalsIgnoreCase(email))) {
+            // Check if email already exists (Optimized using the Repository method)
+            if (studentRepo.findByEmail(email).isPresent()) {
                 model.addAttribute("error", "Email is already registered!");
                 return "register";
             }
