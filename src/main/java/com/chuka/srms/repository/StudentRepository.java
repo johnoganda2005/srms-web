@@ -11,10 +11,10 @@ import java.util.Optional;
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long> {
 
-    // 1. Used for login and checking if an email is already registered
+    // Used for login and checking if an email is already registered
     Optional<Student> findByEmail(String email);
 
-    // 2. Used for the Admin Dashboard to show only pending students
+    // Used for the Admin Dashboard to show only pending students
     List<Student> findByStatus(ApprovalStatus status);
     
 }
