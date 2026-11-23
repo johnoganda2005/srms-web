@@ -30,8 +30,12 @@ let allStudentsCache = [];
 function showPage(pageName) {
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
     document.querySelectorAll('.sidebar a').forEach(btn => btn.classList.remove('active'));
-    document.getElementById('page-' + pageName).classList.add('active');
-    document.getElementById('nav-' + pageName).classList.add('active');
+    
+    const pageEl = document.getElementById('page-' + pageName);
+    const navEl = document.getElementById('nav-' + pageName);
+    
+    if (pageEl) pageEl.classList.add('active');
+    if (navEl) navEl.classList.add('active');
 
     const titles = {
         'dashboard': 'Dashboard Overview', 
@@ -44,7 +48,7 @@ function showPage(pageName) {
         'allocations': 'Course Allocation', 
         'reports': 'Academic Reports'
     };
-    document.getElementById('pageTitle').innerText = titles[pageName];
+    document.getElementById('pageTitle').innerText = titles[pageName] || 'Chuka SRMS';
 
     if (pageName === 'students') document.getElementById('searchContainer').style.display = 'flex';
     else document.getElementById('searchContainer').style.display = 'none';
@@ -165,7 +169,7 @@ function handleSearch(event) {
     }
 }
 
-// REGISTRATIONS (NEW)
+// REGISTRATIONS
 function loadRegistrations() {
     fetch('https://srms-web-pci5.onrender.com/api/register')
         .then(res => res.json())
@@ -337,4 +341,49 @@ function loadAllocations() {
 function addAllocation() { const a = { allocationId: document.getElementById('allocationId').value, courseId: document.getElementById('allocCourseId').value, tutorId: document.getElementById('allocTutorId').value, semester: parseInt(document.getElementById('allocSemester').value), year: parseInt(document.getElementById('allocYear').value) }; fetch('https://srms-web-pci5.onrender.com/api/allocations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) }).then(() => loadAllocations()); }
 function updateAllocation() { const id = document.getElementById('allocationId').value; const a = { allocationId: id, courseId: document.getElementById('allocCourseId').value, tutorId: document.getElementById('allocTutorId').value, semester: parseInt(document.getElementById('allocSemester').value), year: parseInt(document.getElementById('allocYear').value) }; fetch(`https://srms-web-pci5.onrender.com/api/allocations/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) }).then(() => loadAllocations()); }
 function deleteAllocation(id) { if(confirm("Delete this allocation?")) fetch(`https://srms-web-pci5.onrender.com/api/allocations/${id}`, { method: 'DELETE' }).then(() => loadAllocations()); }
-function editAllocation(id, course, tutor, sem, year) { document.getElementById('allocation
+
+function editAllocation(id, course, tutor, sem, year) { 
+    document.getElementById('allocationId').value = id; 
+    document.getElementById('allocationId').readOnly = true; 
+    document.getElementById('allocCourseId').value = course; 
+    document.getElementById('allocTutorId').value = tutor; 
+    document.getElementById('allocSemester').value = sem; 
+    document.getElementById('allocYear').value = year; 
+    document.getElementById('addAllocBtn').style.display = 'none'; 
+    document.getElementById('updateAllocBtn').style.display = 'inline-block'; 
+    document.getElementById('cancelAllocBtn').style.display = 'inline-block'; 
+}
+function resetAllocationForm() { 
+    document.getElementById('allocationId').value = ''; 
+    document.getElementById('allocationId').readOnly = false; 
+    document.getElementById('allocCourseId').value = ''; 
+    document.getElementById('allocTutorId').value = ''; 
+    document.getElementById('allocSemester').value = ''; 
+    document.getElementById('allocYear').value = ''; 
+    document.getElementById('addAllocBtn').style.display = 'inline-block'; 
+    document.getElementById('updateAllocBtn').style.display = 'none'; 
+    document.getElementById('cancelAllocBtn').style.display = 'none'; 
+}
+
+// --- MISSING FUNCTIONS ADDED ---
+function loadCharts() {
+    console.log("Charts loading... (Placeholder for Chart.js)");
+}
+
+function loadReportDropdown() {
+    fetch('https://srms-web-pci5.onrender.com/api/students?size=1000').then(res => res.json()).then(data => {
+        const select = document.getElementById('reportStudentSelect');
+        if (!select) return;
+        select.innerHTML = '<option value="">-- Select a Student --</option>';
+        data.content.forEach(s => { 
+            select.innerHTML += `<option value="${s.studentId}">${s.studentId} - ${s.firstName} ${s.lastName}</option>`; 
+        });
+    });
+}
+
+function generateTranscript() {
+    alert("Transcript generation to be implemented in backend.");
+}
+function downloadPdf() {
+    alert("PDF Download to be implemented.");
+}
